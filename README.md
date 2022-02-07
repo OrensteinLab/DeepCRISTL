@@ -20,6 +20,8 @@ For training the pre-train model, use the file - "main.py".
   * train - training the model
   * postprocess - geting plots of training results
 * --enzyme = the enzyme data that will be used as pre-train data - [wt, esp, hf, multi_task]
+* Example code:
+-s_type train --pre_train_data DeepHF_old   --enzyme multi_task
 
 # Transfer learning model
 For training the model on the endogenous and functional data, use the file - "main_tl.py"
@@ -30,5 +32,7 @@ For training the model on the endogenous and functional data, use the file - "ma
 
 * --tl_data = The data which will be fine tuned on
 *  --tl_data_category = The type of fine tuned data - [u6t7, leenay]
+* Example code:
+-s_type postprocess --tl_data doench2014-Hs --pre_train_data DeepHF_old  --tl_data_category u6t7 --enzyme wt
 
   
