@@ -16,4 +16,7 @@ For training the model on the endogenous and functional data, use the file - "ma
   * full_sim - run all transfer learning approaches
   * postprocess - recive plots of results
 
+* --tl_data = The data which will be fine tuned on
+*  --tl_data_category = The type of fine tuned data - [u6t7, leenay]
+
   
