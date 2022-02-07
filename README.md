@@ -1,5 +1,17 @@
 # System requirements
 * python=3.8
+* numpy=1.14.0
+* scipy=1.0.0
+* h5py=2.7.1
+* tensorflow=1.8.0
+* keras=2.1.6
+* scikit-learn=0.19.1
+* biopython=1.71
+* viennarna=2.4.5
+* matplotlib
+* DotMap
+* GPyOpt
+* pandas
 
 #  Pre-train model
 For training the pre-train model, use the file - "main.py".
