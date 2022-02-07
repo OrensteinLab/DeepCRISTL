@@ -4,6 +4,16 @@
 #  Pre-train model
 For training the pre-train model, use the file - "main.py".
 * -s_type = the simulation type:
-  * a
-  * b
+  * preprocess - preparing the data in objects and divide to train and test
+  * train - training the model
+  * postprocess - geting plots of training results
+* --enzyme = the enzyme data that will be used as pre-train data - [wt, esp, hf, multi_task]
+
+# Transfer learning model
+For training the model on the endogenous and functional data, use the file - "main_tl.py"
+* -s_type = the simulation type:
+  * preprocess - prepare data
+  * full_sim - run all transfer learning approaches
+  * postprocess - recive plots of results
+
   
