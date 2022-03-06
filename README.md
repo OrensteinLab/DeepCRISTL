@@ -35,6 +35,12 @@ For training the model on the endogenous and functional data, use the file - "ma
 * Example code:
 -s_type postprocess --tl_data doench2014-Hs --pre_train_data DeepHF_old  --tl_data_category u6t7 --enzyme wt
 
+
+# Transfer learning with CRISPROn model
+run the "CRISPRon/main.py" file with the following configurations:
+
+Start from preprocessing the data using the followin code:
+-s_type preprocess --tl_data_category U6T7 --tl_data chari2015Train293T
 # Model interpertation
 For interperting the expirements, run the file "ModelInterpertations/model_interpertation.py". 
 For any new expirement, add the expirement name to the expirement list in line 112. 
