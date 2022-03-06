@@ -35,4 +35,11 @@ For training the model on the endogenous and functional data, use the file - "ma
 * Example code:
 -s_type postprocess --tl_data doench2014-Hs --pre_train_data DeepHF_old  --tl_data_category u6t7 --enzyme wt
 
+# Model interpertation
+For interperting the expirements, run the file "ModelInterpertations/model_interpertation.py". 
+For any new expirement, add the expirement name to the expirement list in line 112. 
+You can choose the pre train model with the "--enzyme" option. FOr the multi task model, write multi_task as in the example.
+* Example code:
+-s_type interpertation --enzyme multi_task --pre_train_data DeepHF_old
+
   
