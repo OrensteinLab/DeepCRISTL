@@ -56,4 +56,9 @@ You can choose the pre train model with the "--enzyme" option. FOr the multi tas
 * Example code:
 -s_type interpertation --enzyme multi_task --pre_train_data DeepHF_old
 
+# Data:
+All the data are publicly available at the following papers:
+* DeepHF - https://www.nature.com/articles/s41467-019-12281-8
+* 
+
   
