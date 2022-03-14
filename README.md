@@ -8,6 +8,7 @@
 * scikit-learn=0.19.1
 * biopython=1.71
 * viennarna=2.4.5
+* cutadapt=1.18
 * matplotlib
 * DotMap
 * GPyOpt
