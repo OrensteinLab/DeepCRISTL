@@ -59,6 +59,8 @@ You can choose the pre train model with the "--enzyme" option. FOr the multi tas
 # Data:
 All the data are publicly available at the following papers:
 * DeepHF - https://www.nature.com/articles/s41467-019-12281-8
-* 
+* Leenay - https://www.nature.com/articles/s41587-019-0203-2
+* Haussler - https://link.springer.com/article/10.1186/s13059-016-1012-2
+* CISPROn - https://www.nature.com/articles/s41467-021-23576-0
 
   
