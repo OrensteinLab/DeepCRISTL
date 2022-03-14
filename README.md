@@ -14,6 +14,7 @@
 * GPyOpt
 * pandas
 
+We have used the code of the DeepHF model as our baeline code.
 #  Pre-train model
 For training the pre-train model, use the file - "main.py".
 * -s_type = the simulation type:
