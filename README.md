@@ -64,4 +64,8 @@ All the data are publicly available at the following papers:
 * Haussler - https://link.springer.com/article/10.1186/s13059-016-1012-2
 * CISPROn - https://www.nature.com/articles/s41467-021-23576-0
 
+# Trained models:
+All models can be found and downloaded at:
+https://drive.google.com/drive/folders/1E6_o5rqv0-_KhWHkgmlbuxbw2PNGw-E0?usp=sharing
+
   
