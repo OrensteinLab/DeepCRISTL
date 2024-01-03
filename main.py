@@ -33,9 +33,11 @@ if __name__ == '__main__':
     #     line = f.readline()
     #     print(line)
     # Using only needed memory on GPU
-    con = tf.compat.v1.ConfigProto()
-    con.gpu_options.allow_growth = True
-    tf.compat.v1.keras.backend.set_session(tf.compat.v1.Session(config=con))
+
+    # TODO: uncomment it?
+    #con = tf.compat.v1.ConfigProto()
+    #con.gpu_options.allow_growth = True
+    #tf.compat.v1.keras.backend.set_session(tf.compat.v1.Session(config=con))
 
 
 

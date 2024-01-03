@@ -5,6 +5,8 @@ import scipy as sp
 import os
 from keras.models import load_model, Model
 import keras
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import pandas as pd
 import pickle
