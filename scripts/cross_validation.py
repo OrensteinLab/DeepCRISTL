@@ -126,6 +126,8 @@ def train_10_fold(config, DataHandler):
 
     if config.simulation_type == 'cross_v':
         results_path = 'results/transfer_learning/' if config.transfer_learning else 'results/pre_train/'
+        if not os.path.exists('results'):
+            os.mkdir('results')
         if not os.path.exists(results_path):
             os.mkdir(results_path)
         results_path += f'{config.pre_train_data}_{config.enzyme}_cross_v.txt'
