@@ -27,7 +27,7 @@ def get_parser():
     parser.add_argument('--transfer_learning','-tl', dest='transfer_learning', action='store_true')
     parser.add_argument('--no_weights', dest='no_weights', action='store_true')
     parser.add_argument('--data_name', type=str, default=None)  # Relevant only for transfer learning
-    parser.add_argument('--pre_train_data', type=str, default='DeepHF_full')  # [DeepHF_55k, DeepHF_full, DeepHF_old]
+    parser.add_argument('--pre_train_data', type=str, default='DeepHF_old')  # [DeepHF_55k, DeepHF_full, DeepHF_old]
 
 
 

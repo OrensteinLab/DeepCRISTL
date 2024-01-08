@@ -114,6 +114,8 @@ def prepare_old_data(data_columns):
             "normalize_features": None
         }
         feature_sets = feature_util.featurize_data(df, feature_options)
+
+
         for feature in feature_sets.keys():
             print(feature)
             reindexed_feature_df = feature_sets[feature]

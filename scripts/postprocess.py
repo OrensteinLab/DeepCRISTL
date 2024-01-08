@@ -47,12 +47,16 @@ def final_results():
 
 
 def ensemble_vs_num_of_models(config):
-    enzymes = ['wt', 'esp', 'hf', 'multi_task']
+    # TODO: change to whatever is needed
+    enzymes = ['wt']
+    #enzymes = ['wt', 'esp', 'hf', 'multi_task']
+
     # enzymes = ['multi_task']
 
     if os.path.exists('results/pre_train/spearmans.pkl'):
         with open('results/pre_train/spearmans.pkl', "rb") as fp:
             spearmans = pickle.load(fp)
+            print(spearmans)
     else:
         spearmans = {}
         for enzyme in enzymes:
@@ -78,12 +82,13 @@ def test_means(config, DataHandler):
 
     all_models = []
     model_ind = 0
-    model_path = models_dir + 'model_0/model'
+    model_path = models_dir + 'model_0/model' # TODO  change to 0
 
     if config.enzyme == 'multi_task':
         predictions = {'wt': [], 'esp': [], 'hf': []}
     else:
         predictions = []
+
 
     # Receiving predictions
     while os.path.exists(model_path):
@@ -133,7 +138,9 @@ def test_means(config, DataHandler):
                 spearmans[enzyme].append(spearman)
     else:
         predictions = np.array(predictions)
-        predictions = np.squeeze(predictions)
+        print(predictions.shape)
+        predictions = np.squeeze(predictions, axis=2)
+        print(predictions.shape)
         final_preds =  np.zeros((test_prediction.shape[0], len(predictions)))
         for i in range(len(predictions)):
             preds = predictions[:i+1]
@@ -141,7 +148,6 @@ def test_means(config, DataHandler):
                 final_preds[:, i] = preds
             else:
                 final_preds[:, i] = np.mean(preds, axis=0)
-
         spearmans = []
         for i in range(final_preds.shape[1]):
             pred = final_preds[:, i]
@@ -196,7 +202,7 @@ def plot_spearman_curve(spearmans):
 
 
     leg2 = plt.legend(enzyme_legend, enzymes, bbox_to_anchor=(0.65, 0.22))
-    leg3 = plt.legend([enzyme_legend[0], sing_vs_multi_legend[0]], ['Single-task', 'Multi-task'],  bbox_to_anchor=(0.9, 0.22))
+    #leg3 = plt.legend([enzyme_legend[0], sing_vs_multi_legend[0]], ['Single-task', 'Multi-task'],  bbox_to_anchor=(0.9, 0.22)) TODO: add this back when have multi task
     plt.gca().add_artist(leg2)
 
     # plt.legend(bbox_to_anchor=(0.3, 0.4))
@@ -204,7 +210,7 @@ def plot_spearman_curve(spearmans):
     plt.xlabel('Number of models')
     plt.xticks(np.arange(1, 21))
     plt.title('Ensemble model spearman result Vs number of models')
-    plt.show()
+    plt.savefig('results/pre_train/ensemble_vs_num_of_models.png')
 
 
 
