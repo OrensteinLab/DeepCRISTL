@@ -23,6 +23,9 @@ def combine_data_files():
     # sort by index
     df = df.sort_values(by=['21mer'])
 
+    # Remove rows with NaN values
+    df = df.dropna()
+
     return df
 
 def calculate_hamming_distance_matix(df):
@@ -202,6 +205,12 @@ def save_files(train, val, test):
     val.to_csv('output/valid.csv', index=False)
     test.to_csv('output/test.csv', index=False)
 
+def remove_incomplete_rows(df):
+    df = df.dropna()
+
+    return df
+
+
 
 def main():
 
@@ -228,6 +237,7 @@ def main():
 
     combined_df = combine_data_files()
     train, test = train_test_split(combined_df, sets, test_ratio=0.15)
+    test = remove_incomplete_rows(test)
     train, val = train_val_split(train, val_ratio=0.1)
 
     save_files(train, val, test)

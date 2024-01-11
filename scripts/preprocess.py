@@ -131,11 +131,12 @@ def prepare_old_data(data_columns):
     full_df.rename(columns=name_dict, inplace=True)
 
 
-    wt_cond = full_df['wt_mean_eff'].notna()
-    esp_cond = full_df['esp_mean_eff'].notna()
-    hf_cond = full_df['hf_mean_eff'].notna()
+    #wt_cond = full_df['wt_mean_eff'].notna()
+    #esp_cond = full_df['esp_mean_eff'].notna()
+    #hf_cond = full_df['hf_mean_eff'].notna()
 
-    test_df = full_df[wt_cond & esp_cond & hf_cond].sample(frac=0.15).sort_index()
+    #test_df = full_df[wt_cond & esp_cond & hf_cond].sample(frac=0.15).sort_index()
+    test_df = full_df.sample(frac=0.15).sort_index()
     train_val_df = full_df.drop(test_df.index)
 
     valid_full_df = train_val_df.sample(frac=0.1).sort_index()
