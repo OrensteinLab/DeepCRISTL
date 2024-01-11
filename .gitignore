@@ -14,3 +14,9 @@ scripts/__pycache__/configurations.cpython-311.pyc
 
 # Ignore npy (numpy) files
 *.npy
+
+# Ignore pickle files
+*.pickle
+
+# Ignore png files
+*.png

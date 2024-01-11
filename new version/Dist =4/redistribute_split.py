@@ -8,8 +8,6 @@ import os
 import pandas as pd
 import Levenshtein as lev
 
-MAX_DISTANCE = 4
-
 # VAL is 10% of train
 # Train test split is 85% 15%
 
@@ -141,68 +139,6 @@ def load_neighborehood_matrix():
     print('Loading neighborehood matrix...')
     return np.load('neighborehood_matrix.npy')
 
-
-
-
-def train_test_split(df, sets, test_ratio):
-
-    # order sets by size
-    sets = sorted(sets, key=len)
-
-    train_ratio = 1 - test_ratio
-
-    train = pd.DataFrame()
-    test = pd.DataFrame()
-    
-
-
-    for i, sequence_set in enumerate(sets):
-       # print('Splitting set: {}/{} ({:.2f}%)'.format(i, len(sets), (i / len(sets)) * 100))
-
-        normalized_train_size = len(train) * test_ratio
-        normalized_test_size = len(test) * train_ratio
-
-        #print('Normalized train size: {}'.format(normalized_train_size))
-        #print('Normalized test size: {}'.format(normalized_test_size))
-        # calculate percentage of train and test
-        #if normalized_train_size != 0 and normalized_test_size != 0:
-        #    print('Train percentage: {}'.format(len(train) / (len(train) + len(test))))
-        #    print('Test percentage: {}'.format(len(test) / (len(train) + len(test))))
-
-        if normalized_train_size < normalized_test_size:
-            train = train._append(df.iloc[list(sequence_set)])
-        else:
-            test = test._append(df.iloc[list(sequence_set)])
-
-    return train, test
-
-        
-
-
-def train_val_split(df, val_ratio):
-    val = df.sample(frac=val_ratio)
-    train = df.drop(val.index)
-
-    return train, val
-
-def save_files(train, val, test):
-
-    # Order by index
-    train = train.sort_values(by=['21mer'])
-    val = val.sort_values(by=['21mer'])
-    test = test.sort_values(by=['21mer'])
-
-
-    # create folder
-    if not os.path.exists('output'):
-        os.makedirs('output')
-    
-    # save files
-    train.to_csv('output/train.csv', index=False)
-    val.to_csv('output/valid.csv', index=False)
-    test.to_csv('output/test.csv', index=False)
-
-
 def main():
 
 
@@ -212,7 +148,7 @@ def main():
             hamming_matrix = calculate_hamming_distance_matix(combined_df)
             save_hamming_matrix(hamming_matrix)
         hamming_matrix = load_hamming_matrix()
-        neighborehood_matrix = apply_neighbore_filter(hamming_matrix, max_distance=MAX_DISTANCE)
+        neighborehood_matrix = apply_neighbore_filter(hamming_matrix, max_distance=4)
         save_neighborehood_matrix(neighborehood_matrix)
 
     neighborehood_matrix = load_neighborehood_matrix()
@@ -222,17 +158,7 @@ def main():
         save_sets(sets)
     
     sets = load_sets()
-
     check_stats(neighborehood_matrix, sets)
-
-
-    combined_df = combine_data_files()
-    train, test = train_test_split(combined_df, sets, test_ratio=0.15)
-    train, val = train_val_split(train, val_ratio=0.1)
-
-    save_files(train, val, test)
-
-
 
 if __name__ == '__main__':
     main()
