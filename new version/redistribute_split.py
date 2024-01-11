@@ -2,6 +2,7 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
+import pickle
 
 import os
 import pandas as pd
@@ -45,12 +46,12 @@ def apply_neighbore_filter(hamming_matrix, max_distance):
 
     return hamming_matrix
 
-def check_stats(hamming_matrix, sets):
+def check_stats(neighborehood_matrix, sets):
     print('Checking stats...')
-    neighbores_per_row = np.sum(hamming_matrix, axis=1) 
+    neighbores_per_row = np.sum(neighborehood_matrix, axis=1) 
 
     plt.hist(neighbores_per_row, bins=100)
-    plt.title('Neighbor distribution, row-legth: {}'.format(len(hamming_matrix)))
+    plt.title('Neighbor distribution, row-legth: {}'.format(len(neighborehood_matrix)))
     plt.show()
 
     # Show the size of the sets using a histogram
@@ -61,7 +62,8 @@ def check_stats(hamming_matrix, sets):
 
 
 
-def get_sets(neighborehood_matrix, combined_df):
+def get_sets(neighborehood_matrix):
+    print('Getting sets...')
     length = len(neighborehood_matrix)
     sets = []
     used_indexes = []
@@ -70,22 +72,46 @@ def get_sets(neighborehood_matrix, combined_df):
         if i in used_indexes:
             continue
         else:
+            print('Getting set for index: {}/{} ({:.2f}%)'.format(i, length, (i / length) * 100))
             sequence_set = get_bfs(neighborehood_matrix, i)
             sets.append(sequence_set)
             used_indexes.extend(sequence_set)
 
+    return sets
+
+def save_sets (sets):
+    print('Saving sets...')
+    # save with pickle
+    with open('sets.pickle', 'wb') as f:
+        pickle.dump(sets, f)
+
+
+
+def load_sets():
+    print('Loading sets...')
+    with open('sets.pickle', 'rb') as f:
+        sets = pickle.load(f)
+
+    return sets
+
+
+def check_sets_missing():
+    return not os.path.isfile('sets.pickle')
+  
 
 def get_bfs(neighborehood_matrix, start_index):
     # Returns a set of all sequences that are connected to the start_index in the neighborehood_matrix
-    # Uses a BFS algorithm
+    length = len(neighborehood_matrix)
     queue = []
     queue.append(start_index)
-    visited = []
-    while len(queue) > 0:
+    visited = set()
+
+    while queue:
         current_index = queue.pop(0)
-        visited.append(current_index)
-        for i in range(len(neighborehood_matrix[current_index])):
-            if neighborehood_matrix[current_index][i] == 1 and i not in visited:
+        visited.add(current_index)
+        
+        for i in range(length):
+            if neighborehood_matrix[current_index][i] == True and i not in visited:
                 queue.append(i)
 
     return visited
@@ -98,19 +124,40 @@ def load_hamming_matrix():
     print('Loading hamming matrix...')
     return np.load('hamming_matrix.npy')
 
-def check_hamming_matrix_exists():
-    return os.path.isfile('hamming_matrix.npy')
+def check_hamming_matrix_missing():
+    return not os.path.isfile('hamming_matrix.npy')
+
+def check_neighborehood_matrix_missing():
+    return not os.path.isfile('neighborehood_matrix.npy')
+
+def save_neighborehood_matrix(neighborehood_matrix):
+    neighborehood_matrix = neighborehood_matrix.astype(bool)
+    print('Saving neighborehood matrix...')
+    np.save('neighborehood_matrix', neighborehood_matrix)
+
+def load_neighborehood_matrix():
+    print('Loading neighborehood matrix...')
+    return np.load('neighborehood_matrix.npy')
 
 def main():
-    hamming_matrix_is_already_calculated = check_hamming_matrix_exists()
-    if not hamming_matrix_is_already_calculated:
-        combined_df = combine_data_files()
-        hamming_matrix = calculate_hamming_distance_matix(combined_df)
-        save_hamming_matrix(hamming_matrix)
-    hamming_matrix = load_hamming_matrix()
-    neighborehood_matrix = apply_neighbore_filter(hamming_matrix, max_distance=4)
-    sets = get_sets(neighborehood_matrix, combined_df)
 
+
+    if check_neighborehood_matrix_missing():
+        if check_hamming_matrix_missing():
+            combined_df = combine_data_files()
+            hamming_matrix = calculate_hamming_distance_matix(combined_df)
+            save_hamming_matrix(hamming_matrix)
+        hamming_matrix = load_hamming_matrix()
+        neighborehood_matrix = apply_neighbore_filter(hamming_matrix, max_distance=4)
+        save_neighborehood_matrix(neighborehood_matrix)
+
+    neighborehood_matrix = load_neighborehood_matrix()
+    # print some of the neighborehood matrix
+    if check_sets_missing():
+        sets = get_sets(neighborehood_matrix)
+        save_sets(sets)
+    
+    sets = load_sets()
     check_stats(neighborehood_matrix, sets)
 
 if __name__ == '__main__':
