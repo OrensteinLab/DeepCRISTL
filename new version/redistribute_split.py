@@ -23,9 +23,6 @@ def combine_data_files():
     # sort by index
     df = df.sort_values(by=['21mer'])
 
-    # Remove rows with NaN values
-    df = df.dropna()
-
     return df
 
 def calculate_hamming_distance_matix(df):
@@ -58,6 +55,10 @@ def check_stats(neighborehood_matrix, sets):
     plt.hist(neighbores_per_row, bins=100)
     plt.title('Neighbor distribution, row-legth: {}'.format(len(neighborehood_matrix)))
     plt.savefig('neighbor_distribution.png')
+
+    # clear
+    plt.clf()
+
 
     # Show the size of the sets using a histogram
     set_sizes = [len(s) for s in sets]
