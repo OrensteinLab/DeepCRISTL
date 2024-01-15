@@ -1,0 +1,3 @@
+Size before: 56552
+Size after removal of 3: 55421
+Size after removal of 4: 55082
