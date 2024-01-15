@@ -23,9 +23,9 @@ from scripts_tl import postprocess_tl
 
 if __name__ == '__main__':
     # Using only needed memory on GPU
-    con = tf.compat.v1.ConfigProto()
-    con.gpu_options.allow_growth = True
-    tf.compat.v1.keras.backend.set_session(tf.compat.v1.Session(config=con))
+    # con = tf.compat.v1.ConfigProto()
+    # con.gpu_options.allow_growth = True
+    # tf.compat.v1.keras.backend.set_session(tf.compat.v1.Session(config=con))
 
     # Get configs
     config = cfg_tl.get_parser()

@@ -177,6 +177,12 @@ def prepare_u6_t7_files(config, dir_path):
         df.rename(columns={'seq': '21mer'}, inplace=True)
         # df['21mer'] = df['21mer'].map(lambda x: x[0:21])
 
+        # Check if all rows have longSeq100Bp as a string and print the ones that don't
+        for index, row in df.iterrows():
+            if type(row['longSeq100Bp']) != str:
+                print(f'Row {index} is not a string but is a {type(row["longSeq100Bp"])}')
+                print(row['longSeq100Bp'])
+
         df['21mer'] = df['longSeq100Bp'].map(lambda x: x[30:51])
 
         df['downstream'] = df['longSeq100Bp'].map(lambda x: x[6:30])
