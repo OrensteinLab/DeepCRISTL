@@ -40,8 +40,9 @@ def create_data(config, DataHandler):
     X_biofeat = np.concatenate((DataHandler['X_biofeat_train'], DataHandler['X_biofeat_valid']))
     y = np.concatenate((DataHandler['y_train'], DataHandler['y_valid']))
 
-    if config.simulation_type == 'full_cross_v':
-        X, X_biofeat, y = concantenate_test_data(config, X, X_biofeat, y, DataHandler)
+    # If full cross validation, add test data -> Note: this is already done on the file level so this is redundant
+    # if config.simulation_type == 'full_cross_v':
+    #     X, X_biofeat, y = concantenate_test_data(config, X, X_biofeat, y, DataHandler)
 
     if weighted_loss:
         confidence = np.concatenate((DataHandler['conf_train'], DataHandler['conf_valid']))

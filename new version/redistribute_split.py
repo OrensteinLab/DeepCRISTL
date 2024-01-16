@@ -5,23 +5,71 @@ import matplotlib.pyplot as plt
 import pickle
 
 import os
+import sys
 import pandas as pd
 import Levenshtein as lev
 
 MAX_DISTANCE = 4
+TL_BASE_PATH = '../data/tl_train/U6T7/'
 
-# VAL is 10% of train
-# Train test split is 85% 15%
+def get_folders(path):
+    folders = []
+    names = []
+    for folder in os.listdir(path):
+        if os.path.isdir(os.path.join(path, folder)):
+            folders.append(folder)
+            names.append(folder)
+    return folders, names
 
-def combine_data_files():
+def get_first_set(path):
+    return path + '/set0/'
+
+
+def get_df_from_folder(path):
+    # open test.csv
+    df = pd.read_csv(path + 'test.csv')
+    # open train.csv
+    df_train = pd.read_csv(path + 'train.csv')
+    # open valid.csv
+    df_valid = pd.read_csv(path + 'valid.csv')
+
+    # concat all dataframes
+    df = pd.concat([df, df_train, df_valid])
+    return df
+
+def combine_data_files(remove_tl_leakage=False):
     print('Combining data files...')
+
+
+
     files = ['test.csv', 'train.csv', 'valid.csv']
     df = pd.DataFrame()
     for file in files:
         df = df._append(pd.read_csv(file))
 
+    # Remove rows in df that are distance 4 or less from tl_dataframes in the field '21mer' usign hammings distance
+    if remove_tl_leakage:
+        print('Removing TL leakage...')
+        new_df = pd.DataFrame()
+        tl_folders, tl_names = get_folders(TL_BASE_PATH)
+        tl_folders = [get_first_set(TL_BASE_PATH + folder) for folder in tl_folders]
+        tl_dataframes = [get_df_from_folder(folder) for folder in tl_folders]
+        removed = 0
+        for sequence in df['21mer'].values:
+            if not any(lev.distance(sequence, tl_sequence) <= MAX_DISTANCE for tl_df in tl_dataframes for tl_sequence in tl_df['21mer'].values):
+                new_df = new_df._append(df[df['21mer'] == sequence])
+            else:
+                removed += 1
+
+        df = new_df
+        print('Removed {} rows'.format(removed))
+
+
+
     # sort by index
     df = df.sort_values(by=['21mer'])
+
+
 
     return df
 
@@ -157,7 +205,6 @@ def train_test_split(df, sets, test_ratio):
 
     train = pd.DataFrame()
     test = pd.DataFrame()
-    
 
 
     for i, sequence_set in enumerate(sets):
@@ -189,12 +236,13 @@ def train_val_split(df, val_ratio):
 
     return train, val
 
-def save_files(train, val, test):
+def save_files(train, val, test, remove_tl_leakage=False):
 
     # Order by index
     train = train.sort_values(by=['21mer'])
     val = val.sort_values(by=['21mer'])
-    test = test.sort_values(by=['21mer'])
+    if not remove_tl_leakage:
+        test = test.sort_values(by=['21mer'])
 
 
     # create folder
@@ -214,34 +262,44 @@ def remove_incomplete_rows(df):
 
 
 def main():
+    # check args length
+    if len(sys.argv)==2 and sys.argv[1] == 'remove_tl_leakage':
+        REMOVE_TL_LEAKAGE = True
+    else:
+        REMOVE_TL_LEAKAGE = False
+
+    if REMOVE_TL_LEAKAGE:
+        train = combine_data_files(remove_tl_leakage=True)
+        test = pd.DataFrame(columns=train.columns)
+        train, val = train_val_split(train, val_ratio=0.1)
+        save_files(train, val, test, remove_tl_leakage=True)
+    else:
+        if check_neighborehood_matrix_missing():
+            if check_hamming_matrix_missing():
+                combined_df = combine_data_files(REMOVE_TL_LEAKAGE)
+                hamming_matrix = calculate_hamming_distance_matix(combined_df)
+                save_hamming_matrix(hamming_matrix)
+            hamming_matrix = load_hamming_matrix()
+            neighborehood_matrix = apply_neighbore_filter(hamming_matrix, max_distance=MAX_DISTANCE)
+            save_neighborehood_matrix(neighborehood_matrix)
+
+        neighborehood_matrix = load_neighborehood_matrix()
+        # print some of the neighborehood matrix
+        if check_sets_missing():
+            sets = get_sets(neighborehood_matrix)
+            save_sets(sets)
+        
+        sets = load_sets()
+
+        check_stats(neighborehood_matrix, sets)
 
 
-    if check_neighborehood_matrix_missing():
-        if check_hamming_matrix_missing():
-            combined_df = combine_data_files()
-            hamming_matrix = calculate_hamming_distance_matix(combined_df)
-            save_hamming_matrix(hamming_matrix)
-        hamming_matrix = load_hamming_matrix()
-        neighborehood_matrix = apply_neighbore_filter(hamming_matrix, max_distance=MAX_DISTANCE)
-        save_neighborehood_matrix(neighborehood_matrix)
+        combined_df = combine_data_files()
+        train, test = train_test_split(combined_df, sets, test_ratio=0.15)
+        test = remove_incomplete_rows(test)
+        train, val = train_val_split(train, val_ratio=0.1)
 
-    neighborehood_matrix = load_neighborehood_matrix()
-    # print some of the neighborehood matrix
-    if check_sets_missing():
-        sets = get_sets(neighborehood_matrix)
-        save_sets(sets)
-    
-    sets = load_sets()
-
-    check_stats(neighborehood_matrix, sets)
-
-
-    combined_df = combine_data_files()
-    train, test = train_test_split(combined_df, sets, test_ratio=0.15)
-    test = remove_incomplete_rows(test)
-    train, val = train_val_split(train, val_ratio=0.1)
-
-    save_files(train, val, test)
+        save_files(train, val, test)
 
 
 
