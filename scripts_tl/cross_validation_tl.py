@@ -104,6 +104,7 @@ def cross_v_HPS(config, DataHandler):
             if config.train_type == 'gl_tl':
                 # TODO - use higher lr with multi_task
                 config.init_lr = gl_init_lr
+
             model, callback_list = models_util.load_pre_train_model(config, DataHandler)
         else:
             model, callback_list = models_util.get_model(config, DataHandler)
