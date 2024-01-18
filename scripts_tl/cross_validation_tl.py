@@ -27,6 +27,8 @@ def create_data(config, DataHandler):
 
     X = np.concatenate((DataHandler['X_train'], DataHandler['X_valid']))
     X_biofeat = np.concatenate((DataHandler['X_biofeat_train'], DataHandler['X_biofeat_valid']))
+    #print("TEST4")
+    #print(X_biofeat.shape)
     y = np.concatenate((DataHandler['y_train'], DataHandler['y_valid']))
 
 
@@ -72,11 +74,11 @@ def load_fold_data(config, DataHandler, k):
         DataHandler['X_biofeat_valid'] = pickle.load(open(data_dir + 'X_biofeat_valid.pkl', "rb"))
         DataHandler['X_biofeat_train'] = pickle.load(open(data_dir + 'X_biofeat_train.pkl', "rb"))
         shape = DataHandler['X_biofeat_valid'].shape[0]
-        ohe_mat = np.repeat(np.array([[0.333, 0.333, 0.333]]), shape, axis=0)
-        DataHandler['X_biofeat_valid'] = np.concatenate((DataHandler['X_biofeat_valid'], ohe_mat), axis=1)
+        #ohe_mat = np.repeat(np.array([[0.333, 0.333, 0.333]]), shape, axis=0)
+        #DataHandler['X_biofeat_valid'] = np.concatenate((DataHandler['X_biofeat_valid'], ohe_mat), axis=1) TODO: Removed for now
         shape = DataHandler['X_biofeat_train'].shape[0]
-        ohe_mat = np.repeat(np.array([[0.333, 0.333, 0.333]]), shape, axis=0)
-        DataHandler['X_biofeat_train'] = np.concatenate((DataHandler['X_biofeat_train'], ohe_mat), axis=1)
+        #ohe_mat = np.repeat(np.array([[0.333, 0.333, 0.333]]), shape, axis=0)
+        #DataHandler['X_biofeat_train'] = np.concatenate((DataHandler['X_biofeat_train'], ohe_mat), axis=1) TODO: Removed for now
 
         DataHandler['y_valid'] = pickle.load(open(data_dir + 'y_valid.pkl', "rb"))
         DataHandler['y_train'] = pickle.load(open(data_dir + 'y_train.pkl', "rb"))
@@ -92,6 +94,10 @@ def load_fold_data(config, DataHandler, k):
 
 
 def cross_v_HPS(config, DataHandler):
+    
+    #print("TEST3")
+    #print(DataHandler['X_biofeat_train'].shape)
+    #print(DataHandler['X_biofeat_train'])
     create_data(config, DataHandler)
     best_epoch_arr = []
     # config.epochs = 100
@@ -108,7 +114,13 @@ def cross_v_HPS(config, DataHandler):
             model, callback_list = models_util.load_pre_train_model(config, DataHandler)
         else:
             model, callback_list = models_util.get_model(config, DataHandler)
+
+        #print("TEST2")
+        #print(DataHandler['X_biofeat_train'].shape)
+        #print(DataHandler['X_biofeat_train'])
+
         history = training_util_tl.train_model(config, DataHandler, model, callback_list)
+
         best_epoch = history.history['val_loss'].index(min(history.history['val_loss'])) + 1
 
         best_epoch_arr.append(best_epoch)
@@ -141,6 +153,8 @@ def train_10(config, DataHandler):
             if config.train_type == 'gl_tl':
                 config.init_lr = gl_init_lr
             model, callback_list = models_util.load_pre_train_model(config, DataHandler)
+            # print model.summary()
+            #model.summary()
         else:
             model, callback_list = models_util.get_model(config, DataHandler)
 

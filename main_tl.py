@@ -84,6 +84,9 @@ if __name__ == '__main__':
             config.set = set
             DataHandler = dh_tl.get_data(config, set)
 
+            #print("TEST1")
+            #print(DataHandler['X_biofeat_train'].shape)
+
             enzymes = ['multi_task']#['wt', 'esp', 'hf', 'multi_task']
             train_types = ['full_tl', 'LL_tl', 'gl_tl', 'no_em_tl', 'no_tl', 'no_pre_train']
             for enzyme in enzymes:
