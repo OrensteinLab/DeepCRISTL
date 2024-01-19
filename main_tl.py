@@ -99,7 +99,7 @@ if __name__ == '__main__':
                     print(f'#################### Running {enzyme} with {train_type} model #############################')
                     config.train_type = train_type
                     config.epochs = 1000
-                    config.save_model = True #TODO: Was false previously
+                    config.save_model = False
                     print(f'Running cross_v_HPS for {enzyme} with {train_type} model')
 
                     if config.train_type == 'no_pre_train':
