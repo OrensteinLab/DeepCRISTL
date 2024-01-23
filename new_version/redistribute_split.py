@@ -206,19 +206,11 @@ def train_test_split(df, sets, test_ratio):
     train = pd.DataFrame()
     test = pd.DataFrame()
 
-
     for i, sequence_set in enumerate(sets):
        # print('Splitting set: {}/{} ({:.2f}%)'.format(i, len(sets), (i / len(sets)) * 100))
 
         normalized_train_size = len(train) * test_ratio
         normalized_test_size = len(test) * train_ratio
-
-        #print('Normalized train size: {}'.format(normalized_train_size))
-        #print('Normalized test size: {}'.format(normalized_test_size))
-        # calculate percentage of train and test
-        #if normalized_train_size != 0 and normalized_test_size != 0:
-        #    print('Train percentage: {}'.format(len(train) / (len(train) + len(test))))
-        #    print('Test percentage: {}'.format(len(test) / (len(train) + len(test))))
 
         if normalized_train_size < normalized_test_size:
             train = train._append(df.iloc[list(sequence_set)])
@@ -227,7 +219,27 @@ def train_test_split(df, sets, test_ratio):
 
     return train, test
 
-        
+def random_train_test_split(df, sets, test_ratio, seed):
+    # Order sets by size
+    sets = sorted(sets, key=len)
+
+    np.random.seed(seed)
+
+    np.random.shuffle(sets)
+
+    train_ratio = 1 - test_ratio
+
+    train = pd.DataFrame()
+    test = pd.DataFrame()      
+
+    for i, sequence_set in enumerate(sets):
+        normalized_train_size = len(train) * test_ratio
+        normalized_test_size = len(test) * train_ratio
+
+        if normalized_train_size < normalized_test_size:
+            train = train._append(df.iloc[list(sequence_set)])
+        else:
+            test = test._append(df.iloc[list(sequence_set)])  
 
 
 def train_val_split(df, val_ratio):
@@ -258,6 +270,16 @@ def remove_incomplete_rows(df):
     df = df.dropna()
 
     return df
+
+# Takes a dataframe and redistributes it to train, val and test for a TL dataset
+def redistribute_tl_data(df, seed):
+    hamming_matrix = calculate_hamming_distance_matix(df)
+    neighborehood_matrix = apply_neighbore_filter(hamming_matrix, max_distance=MAX_DISTANCE)
+    sets = get_sets(neighborehood_matrix)
+    train, test = random_train_test_split(df, sets, test_ratio=0.2, seed=seed)
+    train, val = train_val_split(train, val_ratio=0.2)
+
+    return train, val, test
 
 
 
