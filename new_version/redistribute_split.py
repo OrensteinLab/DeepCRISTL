@@ -209,7 +209,6 @@ def train_test_split(df, sets, test_ratio):
     test = pd.DataFrame()
 
     for i, sequence_set in enumerate(sets):
-       # print('Splitting set: {}/{} ({:.2f}%)'.format(i, len(sets), (i / len(sets)) * 100))
 
         normalized_train_size = len(train) * test_ratio
         normalized_test_size = len(test) * train_ratio
@@ -239,9 +238,11 @@ def random_train_test_split(df, sets, test_ratio, seed):
         normalized_test_size = len(test) * train_ratio
 
         if normalized_train_size < normalized_test_size:
-            train = train._append(df.iloc[list(sequence_set)])
+            train = train.append(df.iloc[list(sequence_set)])
         else:
-            test = test._append(df.iloc[list(sequence_set)])  
+            test = test.append(df.iloc[list(sequence_set)])
+
+    return train, test  
 
 
 def train_val_split(df, val_ratio):

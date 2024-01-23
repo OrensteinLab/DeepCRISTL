@@ -239,25 +239,13 @@ def prepare_u6_t7_files(config, dir_path):
 
 
 def split_data_set(df, dir_path):
-    perm = np.arange(df.shape[0])
-    perm = np.random.permutation(perm)
-    test_size = round(len(perm) / 5)
-    sets = 5
-    for i in range(sets):
-        if i == sets - 1:
-            test_idx = perm[i * test_size: ]
-        else:
-            test_idx = perm[i*test_size: (i+1)*test_size]
-        test_df = df.iloc[test_idx]
+    for i in range(5):
+        print(f'Creating set {i} based on seed {i}')
+        train_df, valid_df, test_df = redistribute_split.redistribute_tl_data(df, seed=i)
+        train_val_df = pd.concat([train_df, valid_df], axis=0)
         calc_spearman_for_comparison(test_df, dir_path, i)
 
-        train_val_df = df.drop(test_df.index)
-
-        merged = pd.merge(test_df, train_val_df, how='inner', on=['21mer'])  # inner for intersection - to show that there are not same gRNA in the train and test set
-        assert merged.shape[0] == 0
-
-        valid_df = train_val_df.sample(frac=0.2).sort_index()
-        train_df = train_val_df.drop(valid_df.index)
+       
         perm_path = dir_path + f'set{i}/'
         os.mkdir(perm_path)
         test_df.to_csv(perm_path + 'test.csv', index=False)
@@ -289,44 +277,20 @@ def prepare_leenay(dir_path):
         os.makedirs(dir_path)
     full_df = pd.read_csv('data/main_dataframes/leenay_full_data.csv')
 
-    perm = np.arange(full_df.shape[0])
-    perm = np.random.permutation(perm)
-    test_size = round(len(perm) / 5)
-    sets = 5
-    for i in range(sets):
-        if i == sets - 1:
-            test_idx = perm[i * test_size: ]
-        else:
-            test_idx = perm[i*test_size: (i+1)*test_size]
-        test_df = full_df.iloc[test_idx]
-        train_val_df = full_df.drop(test_df.index)
 
-        merged = pd.merge(test_df, train_val_df, how='inner', on=['21mer'])  # inner for intersection - to show that there are not same gRNA in the train and test set
-        assert merged.shape[0] == 0
+    
+    for i in range(5):
+        print(f'Creating set {i} based on seed {i}')
+        train_df, valid_df, test_df = redistribute_split.redistribute_tl_data(full_df, seed=i)
+        train_val_df = pd.concat([train_df, valid_df], axis=0)
 
-        valid_df = train_val_df.sample(frac=0.2).sort_index()
-        train_df = train_val_df.drop(valid_df.index)
+       
         perm_path = dir_path + f'set{i}/'
         os.mkdir(perm_path)
         test_df.to_csv(perm_path + 'test.csv', index=False)
         train_val_df.to_csv(perm_path + 'train_valid.csv', index=False)
         valid_df.to_csv(perm_path + 'valid.csv', index=False)
         train_df.to_csv(perm_path + 'train.csv', index=False)
-    # split_data_set(full_df, dir_path)
-    #
-    # test_df = full_df.sample(frac=0.2).sort_index()
-    # train_val_df = full_df.drop(test_df.index)
-    # merged = pd.merge(test_df, train_val_df, how='inner', on=['21mer']) #inner for intersection - to show that there are not same gRNA in the train and test set
-    # assert merged.shape[0] == 0
-    #
-    #
-    # valid_df = train_val_df.sample(frac=0.2).sort_index()
-    # train_df = train_val_df.drop(valid_df.index)
-    #
-    # test_df.to_csv(dir_path + 'test.csv', index=False)
-    # train_val_df.to_csv(dir_path + 'train_valid.csv', index=False)
-    # valid_df.to_csv(dir_path + 'valid.csv', index=False)
-    # train_df.to_csv(dir_path + 'train.csv', index=False)
 
 
 def prepare_sequences(reads_sum, dir_path, old, config, add_new_features=False):
