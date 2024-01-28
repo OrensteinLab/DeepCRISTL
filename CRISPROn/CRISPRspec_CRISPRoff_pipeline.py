@@ -53,9 +53,10 @@ RNA_DNA_internal_loop ={3:3.2, 4:3.555, 5:3.725, 6:3.975, 7:4.16, 8:4.33, 9:4.49
 RNA_DNA = None
 def read_energy_parameters(ENERGY_MODELS_PICKLE_FILE = "energy_dics.pkl"):
     global RNA_DNA
-    energy_reader=open(ENERGY_MODELS_PICKLE_FILE, 'rb')
-    RNA_DNA = pickle.load(energy_reader)
-    energy_reader.close()
+    with open(ENERGY_MODELS_PICKLE_FILE, 'rb') as energy_reader:
+        RNA_DNA = pickle.loads(energy_reader.read())
+
+
 
 ####### Necessary for self-folding ######
 RNAFOLD_EXE = "RNAfold"
@@ -78,11 +79,14 @@ def get_rnafold_eng(seq, rid="temp_grna_id"):
         no_constraint_eng = None
         l = len(seq)
         cmd = RNAFOLD_EXE
-        p = subprocess.Popen([cmd, '--noPS'], shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True).communicate(input=">"+rid+"\n"+seq+"\n\n")
-        if p[1]=="":
-            no_constraint_eng = float(p[0].rstrip().split()[-1].replace('(','').replace(')',''))
+        p = subprocess.Popen([cmd, '--noPS'], shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        stdout, stderr = p.communicate(input=(">"+rid+"\n"+seq+"\n\n").encode())
+        #print(stdout, stderr)
+        if stderr=="" or stderr==b'':
+            stdout_str = stdout.decode('utf-8')
+            no_constraint_eng = float(stdout_str.strip().split()[-1].replace('(','').replace(')',''))
         else:
-            sys.stderr.write("#ERROR:RNAfold run went wrong: "+cmd+"; "+p[1]+"\n")
+            sys.stderr.write("#ERROR:RNAfold run went wrong: " + cmd + "; " + stderr.decode() + "\n")
             exit()
         grna_folding_engs[seq] = no_constraint_eng
     return grna_folding_engs[seq]
