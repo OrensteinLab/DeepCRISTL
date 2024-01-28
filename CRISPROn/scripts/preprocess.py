@@ -1,10 +1,12 @@
 import pandas as pd
 import os
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import MinMaxScaler
-from bin import CRISPRspec_CRISPRoff_pipeline as pipe
+import CRISPRspec_CRISPRoff_pipeline as pipe
 import pickle
 
 # def get_crispor():
