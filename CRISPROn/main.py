@@ -43,7 +43,7 @@ if __name__ == '__main__':
 
                 print(f'Running full_train with {train_type} model')
                 config.save_model = True
-                mean = cv_tl.train_10(config, DataHandler)
+                mean = cv_tl.train_6(config, DataHandler)
 
                 print(f'Running ensemble with {train_type} model')
                 spearmanr = ensemble_util.train_ensemble(config, DataHandler)

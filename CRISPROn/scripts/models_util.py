@@ -1,4 +1,5 @@
 from keras.models import load_model
+import tensorflow as tf
 from keras.callbacks import EarlyStopping, Callback
 import warnings
 import os
@@ -102,7 +103,8 @@ def load_pre_train_model(config, DataHandler, verbose=1):
         model_path = f'data/deep_models/best/{config.model_num}.model.best/'
 
 
-    model = load_model(model_path)
+    model = tf.keras.models.load_model(model_path)
+
 
     # Callbacks
     callback_list = []
