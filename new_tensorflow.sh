@@ -4,7 +4,7 @@
 declare -A packages=(
     ["tensorflow"]="2.4.1"
     ["keras"]="2.4.3"
-    ["h5py"]="2.10.10"
+    ["h5py"]="2.10.0"
     # Add more packages as needed
 )
 

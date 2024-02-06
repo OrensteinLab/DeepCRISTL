@@ -13,7 +13,7 @@ def create_data(config, DataHandler):
     data_dir = f'data/tl_train/{config.tl_data_category}/{config.tl_data}/set{config.set}/6_fold/'
     if not os.path.exists(data_dir):
         os.makedirs(data_dir)
-    if os.path.exists(data_dir + '9_fold/'):
+    if os.path.exists(data_dir + '5_fold/'):
         print('Data allready created')
         return
 
