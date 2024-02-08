@@ -180,8 +180,8 @@ def prepare_u6_t7_files(config, dir_path):
                 print(f'Ind: {ind}, mer: {mer}, seq: {seq}, long: {long}')
         # assert df['23mer'].equals(df['seq'])
 
-        df['downstream'] = df['longSeq100Bp'].map(lambda x: x[25:30])
-        df['upstream'] = df['longSeq100Bp'].map(lambda x: x[53:55])
+        df['downstream'] = df['longSeq100Bp'].map(lambda x: x[26:30])
+        df['upstream'] = df['longSeq100Bp'].map(lambda x: x[53:56])
         df['30mer'] = df['downstream'] + df['23mer'] + df['upstream']
 
         mean_eff_col_name = 'modFreq'

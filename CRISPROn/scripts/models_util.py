@@ -98,7 +98,7 @@ class GetBest(Callback):
 
 def load_pre_train_model(config, DataHandler, verbose=1):
     if config.train_type == 'gl_tl':
-        model_path = f'tl_models/transfer_learning/{config.tl_data}/set{config.set}/LL_tl/model_{config.model_num}/model'
+        model_path = f'tl_models/transfer_learning/{config.tl_data}/set{config.set}/LL_tl/model_{config.model_num-1}/model'
     else:
         model_path = f'data/deep_models/best/{config.model_num}.model.best/'
 
