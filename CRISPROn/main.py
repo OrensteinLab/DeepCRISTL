@@ -16,6 +16,7 @@ if __name__ == '__main__':
 
     if config.simulation_type == 'preprocess':
         preprocess.prepare_inputs(config)
+        print('Preprocessing done')
 
     if config.simulation_type == 'full_sim':
         print(f'Running full simulation for {config.tl_data} dataset')
@@ -51,6 +52,10 @@ if __name__ == '__main__':
                 testing_util.save_results(config, set, train_type, mean, spearmanr)
                 keras.backend.clear_session()
 
+            
+        print('Full simulation done')
+
 
     if config.simulation_type == 'postprocess':
         postprocess.postprocess(config)
+        print('Postprocessing done')

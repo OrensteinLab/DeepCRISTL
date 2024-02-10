@@ -261,8 +261,10 @@ def prepare_leenay_files(config, dir_path):
     eng_df = df[['name', '30mer', 'CRISPRoff_score']]
     datasets = ['train_valid', 'train', 'valid', 'test']
     for set in range(5):
+        if not os.path.exists(dir_path + f'set{set}/'):
+            os.mkdir(dir_path + f'set{set}/')
         for dataset in datasets:
-            dataset_df = pd.read_csv(dir_path + f'set{set}/{dataset}.csv')
+            dataset_df = pd.read_csv('../' + dir_path + f'set{set}/{dataset}.csv')
             merged = pd.merge(dataset_df, eng_df, how='inner', on=['name'])
             merged.to_csv(dir_path + f'set{set}/{dataset}_crispr_on.csv', index=False)
 
