@@ -26,9 +26,9 @@ python 3.6 -u ./main.py -s_type cross_v --enzyme wt
 6. run for example python 3.6 -u ./main.py -s_type full_cross_v --enzyme wt
 
 # How to get TL data
-1. Download the supplementary table from CrisprON - a file named "13059_2016_1012_MOESM14_ESM.tsv"
-2. Download the fix files from github (TODO: list them)
-3. Put them in data/main/dataframes
+1. Download the supplementary table from CrisprON - a file named "13059_2016_1012_MOESM14_ESM.tsv" https://springernature.figshare.com/articles/dataset/Additional_file_14_of_Evaluation_of_off-target_and_on-target_scoring_algorithms_and_integration_into_the_guide_RNA_selection_tool_CRISPOR/4466045
+2. Download the fix files from github - all the .tab files in https://github.com/maximilianh/crisporPaper/tree/master/effData
+3. Put them in data/main/dataframes/CrisprOR fixes
 4. run fix_supp.py
 5. For each experiment run  python 3.6 -u ./main_tl.py -s_type preprocess --tl_data xu2015TrainHl60 --tl_data_category U6T7 
 Note that in our experiments we put everything in the U6T7 category for convinicence.
