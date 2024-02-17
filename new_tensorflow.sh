@@ -13,7 +13,7 @@ for package in "${!packages[@]}"; do
     version=${packages[${package}]}
 
     echo "Installing ${package} version ${version}..."
-    pip3.6 install --force-reinstall ${package}==${version}
+    pip install --force-reinstall ${package}==${version}
 
     # Check if the installation was successful
     if [ $? -eq 0 ]; then
