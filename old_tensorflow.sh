@@ -2,9 +2,9 @@
 
 # Define an associative array to store packages and versions
 declare -A packages=(
-    ["tensorflow"]="1.8.0"
-    ["keras"]="2.1.6"
     ["h5py"]="2.7.1"
+    ["keras"]="2.1.6"
+    ["tensorflow"]="1.8.0"
     # Add more packages as needed
 )
 
