@@ -45,6 +45,11 @@ def get_parser():
             print('No input file or model to use specified >>>> exiting\nRun python tool.py -h for help on how to use the tool.')
             exit(1)
 
+
+    config.init_lr = 0.0043
+    config.optimizer = RMSprop
+    config.batch_size = 80
+
     
 
 

@@ -1,20 +1,43 @@
 from scripts_tool import configurations as cfg
 from scripts_tool import preprocess
-#from scripts_tool import data_handler as dh
-#from scripts_tool import cross_validation_tl as cv_tl
+from scripts_tool import data_handler as dh
+from scripts_tool import cross_validation_tl as cv_tl
 #from scripts_tool import ensemble_util
 #from scripts_tool import  hyper_parameter_search as hps
 import keras
 
 #interperter = ModelInterpertation
 
+    
+
 if __name__ == '__main__':
     # Get configs
     config = cfg.get_parser()
 
     if config.action == 'new_data':
+        print('Preprocessing new data')
         preprocess.prepare_inputs(config)
-        exit()
+
+        print(f'Training on {config.new_data_path} dataset')
+        train_types = ['LL_tl', 'gl_tl']
+
+        DataHandler = dh.get_data(config)
+
+        for train_type in train_types:
+            print(f'#################### Running {train_type} model #############################')
+            config.train_type = train_type
+            config.save_model = False
+            print(f'Running cross_v_HPS with {train_type} model')
+            config.epochs = 100
+            opt_epochs = cv_tl.cross_v_HPS(config, DataHandler)
+            config.epochs = opt_epochs
+
+            print(f'Running full_train with {train_type} model')
+            config.save_model = True
+            mean = cv_tl.train_6(config, DataHandler)
+
+            keras.backend.clear_session()
+
 
     if config.action == 'prediction':
         exit()
