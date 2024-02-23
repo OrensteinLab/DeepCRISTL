@@ -71,7 +71,7 @@ def prepare_sequences(config):
 
     sequence = Seq()
     for index, row in df.iterrows():
-        print('line: {}'.format(index))
+        #print('line: {}'.format(index))
         seq = row['30mer']
         dg = row['CRISPRoff_score']
         eff = row['mean_eff']

@@ -1,4 +1,4 @@
-def train_model(config, DataHandler, model, callback_list, verbose=2):
+def train_model(config, DataHandler, model, callback_list, verbose=0):
     if verbose > 0:
         print('Start training')
     train_input, y_train = [DataHandler['X_train'], DataHandler['dg_train']], DataHandler['y_train']
