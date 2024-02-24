@@ -67,12 +67,12 @@ if __name__ == '__main__':
     
 
 
-    if config.action == 'prediction':
+    if config.action == 'prediction':  #TODO: maybe add no transfer learning to the list of models
         from scripts_tool import models_util
         from scripts_tool import preprocess
         from scripts_tool import prediction
 
-        all_available_models = utils.get_all_models()
+        all_available_models = utils.get_all_models() + ['no_transfer_learning']
         if config.model_to_use not in all_available_models:
             print(f'Model {config.model_to_use} not found')
             print(f'Available models:')
@@ -82,7 +82,10 @@ if __name__ == '__main__':
             exit()
         else:
             print(f'Loading models')
-            models = models_util.load_tl_models(config)
+            if config.model_to_use == 'no_transfer_learning':
+                models = models_util.load_no_tl_models()
+            else:
+                models = models_util.load_tl_models(config)
 
             print(f'Preparing data')
             sequences = preprocess.prepare_user_input(config)
@@ -109,14 +112,14 @@ if __name__ == '__main__':
         models_and_datasets = utils.get_all_models()
         models_and_datasets.sort()
         datasets = models_and_datasets
-        models = models_and_datasets + ['no transfer learning']
+        models = models_and_datasets + ['no_transfer_learning']
 
         models_spearmans = {}
         print('Calculating spearmans')
         for model in models:
             print(f'\n\n\nCalculating spearmans for model trained on {model}')
             print('-----------------------------------\n')
-            if model == 'no transfer learning':
+            if model == 'no_transfer_learning':
                 ensemble_models = models_util.load_no_tl_models()
             else:
                 config.model_to_use = model
