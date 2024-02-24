@@ -101,6 +101,14 @@ def load_tl_models(config):
 
     return models
 
+def load_no_tl_models():
+    models = []
+    for i in range(6):
+        model_path = f'data/deep_models/best/{i+1}.model.best/'
+        model = tf.keras.models.load_model(model_path)
+        models.append(model)
+
+    return models
 
 
 def load_pre_train_model(config, DataHandler, verbose=0):
