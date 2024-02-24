@@ -1,5 +1,4 @@
 import argparse
-from keras.optimizers import *
 
 def get_parser():
     parser = argparse.ArgumentParser(description='Process some integers.')
@@ -8,7 +7,7 @@ def get_parser():
                          type=str,
                            default=None,
                            help= 'the simulation to perform.\n new_data requires new_data_path\n prediction requires input_file and model_to_use\n',
-                           choices=['new_data', 'prediction', 'heat_map', 'saliency_maps'])
+                           choices=['new_data', 'list', 'prediction', 'heat_map', 'saliency_maps'])
 
     parser.add_argument('--new_data_path',
                          type=str,
@@ -45,10 +44,11 @@ def get_parser():
             print('No input file or model to use specified >>>> exiting\nRun python tool.py -h for help on how to use the tool.')
             exit(1)
 
-
-    config.init_lr = 0.0043
-    config.optimizer = RMSprop
-    config.batch_size = 80
+    if config.action in ['new_data']:
+      from keras.optimizers import RMSprop
+      config.init_lr = 0.0043
+      config.optimizer = RMSprop
+      config.batch_size = 80
 
     
 

@@ -92,6 +92,15 @@ class GetBest(Callback):
         if self.save_best:
             self.model.save(self.filepath, overwrite=True)
 
+def load_tl_models(config):
+    models = []
+    for i in range(6):
+        model_path = f'tool data/models/{config.model_to_use}/gl_tl/model_{i}/model'
+        model = tf.keras.models.load_model(model_path)
+        models.append(model)
+
+    return models
+
 
 
 def load_pre_train_model(config, DataHandler, verbose=0):

@@ -20,6 +20,12 @@ def prepare_inputs(config):
     else:
         prepare_sequences(config)
 
+def prepare_user_input(config):
+    df = prepare_user_input_features(config)
+    sequence = prepare_user_input_sequences(df)
+    return sequence
+
+
 
 def prepare_files(config):
 
@@ -44,6 +50,26 @@ def prepare_files(config):
     df.to_csv('tool data/datasets/' + config.new_data_path  + '/preprocessed.csv', index=False)
 
 
+def prepare_user_input_features(config):
+    csv_path = 'tool data/input/' + config.input_file + '.csv'
+
+    df = pd.read_csv(csv_path)
+    df['23mer'] = df['30mer'].map(lambda x: x[4:27])
+
+    pipe.read_energy_parameters('data/model/energy_dics.pkl')
+    global RNAFOLD_EXE
+    RNAFOLD_EXE = 'RNAfold'
+
+    df["CRISPRoff_score"] = df.apply(lambda x:
+                                        pipe.get_eng(x['23mer'], x['23mer'], pipe.calcRNADNAenergy, GU_allowed=False,
+                                                pos_weight=True, pam_corr=True, grna_folding=True, dna_opening=True,
+                                                dna_pos_wgh=False), axis=1)
+    
+    return df
+
+
+
+
 def check_files_already_prepared(config):
     if os.path.exists('tool data/datasets/' + config.new_data_path + '/preprocessed.csv'):
         return True
@@ -56,6 +82,17 @@ def check_sequences_prepared(config):
         return True
     else:
         return False
+
+
+def prepare_user_input_sequences(df):
+    sequence = Seq()
+    for index, row in df.iterrows():
+        #print('line: {}'.format(index))
+        seq = row['30mer']
+        dg = row['CRISPRoff_score']
+        sequence.add_seq(seq, dg, 0)
+
+    return sequence
 
 
 def prepare_sequences(config):
