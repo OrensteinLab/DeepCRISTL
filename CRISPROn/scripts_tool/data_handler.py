@@ -18,6 +18,8 @@ def get_data(config):
     DataHandler['X_train_val'] = train_val_seq.X
     DataHandler['y_train_val'] = train_val_seq.y
 
+    return DataHandler
+
 
 def get_user_input_data(sequences):
 
