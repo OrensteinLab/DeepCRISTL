@@ -7,6 +7,7 @@ from scripts import feature_util
 from sklearn.preprocessing import MinMaxScaler
 import scipy as sp
 from new_version import redistribute_split
+from sklearn.model_selection import train_test_split
 
 
 def char2int(char):
@@ -27,7 +28,10 @@ def prepare_inputs(config):
     dir_path = f'data/tl_train/{config.tl_data_category}/{config.tl_data}/'
 
     if config.tl_data == 'leenay':
-        prepare_leenay(dir_path)
+        if config.tl_data_category == 'random':
+            prepare_random_leenay(dir_path)
+        else:
+            prepare_leenay(dir_path)
 
     elif config.tl_data_category == 'U6T7':
         prepare_u6_t7_files(config, dir_path)
@@ -285,6 +289,28 @@ def prepare_leenay(dir_path):
         train_val_df = pd.concat([train_df, valid_df], axis=0)
 
        
+        perm_path = dir_path + f'set{i}/'
+        os.mkdir(perm_path)
+        test_df.to_csv(perm_path + 'test.csv', index=False)
+        train_val_df.to_csv(perm_path + 'train_valid.csv', index=False)
+        valid_df.to_csv(perm_path + 'valid.csv', index=False)
+        train_df.to_csv(perm_path + 'train.csv', index=False)
+
+
+def prepare_random_leenay(dir_path):
+    if os.path.exists(dir_path + 'set4/train.csv'):
+        return
+    if not os.path.exists(dir_path):
+        os.makedirs(dir_path)
+    full_df = pd.read_csv('data/main_dataframes/leenay_full_data.csv')
+
+
+    
+    for i in range(5):
+        print(f'Creating set {i} based on seed {i}')
+        train_val_df, test_df = train_test_split(full_df, test_size=0.2, random_state=i)
+        train_df, valid_df = train_test_split(train_val_df, test_size=0.2, random_state=i)
+        
         perm_path = dir_path + f'set{i}/'
         os.mkdir(perm_path)
         test_df.to_csv(perm_path + 'test.csv', index=False)
