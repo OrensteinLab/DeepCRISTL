@@ -4,15 +4,16 @@ from scripts_tool import data_handler as dh
 from scripts_tool import utils
 import numpy as np
 import pandas as pd
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 import seaborn as sns
 
 def generate_heatmap(config, from_pickle=False):
     import pickle
     from scripts_tool import models_util
     from scripts_tool import testing_util
-    import matplotlib
-    matplotlib.use('Agg')
-    import matplotlib.pyplot as plt
+
 
 
     models_and_datasets = utils.get_all_models()
@@ -68,21 +69,69 @@ def generate_heatmap(config, from_pickle=False):
     # make into a dataframe
     dataframe = pd.DataFrame(numpy_array, columns=datasets, index=models)
 
-    # create a clustermap
-    cluster_grid = sns.clustermap(dataframe, cmap='viridis', method='average', col_cluster=True, row_cluster=True)        
+    generate_one_heatmap(dataframe, numpy_array, models, datasets, 'rc', order_rows=True, order_columns=True)
+    generate_one_heatmap(dataframe, numpy_array, models, datasets, 'r', order_rows=True, order_columns=False)
+    generate_one_heatmap(dataframe, numpy_array, models, datasets, 'c', order_rows=False, order_columns=True)
+    generate_one_heatmap(dataframe, numpy_array, models, datasets, 'none', order_rows=False, order_columns=False)
 
+
+
+
+
+    
+def get_reordered(numpy_array, row_order, column_order, models, datasets):
+    # reorder the rows in the numpy array and the models
+    new_numpy_array = numpy_array[row_order]
+    new_models = [models[i] for i in row_order]
+
+    # reorder the columns in the numpy array and the datasets
+    new_numpy_array = new_numpy_array[:, column_order]
+    new_datasets = [datasets[i] for i in column_order]
+
+    return new_numpy_array, new_models, new_datasets
+
+
+def generate_clustermap(dataframe, order_rows=True, order_columns=True, name='clustermap'):
+    
+    # create a clustermap
+    cluster_grid = sns.clustermap(dataframe, cmap='viridis', method='average', col_cluster=order_columns, row_cluster=order_rows)     
     # save the the clustermap to a file
 
-    PATH_FOR_CLUSTERMAP = 'tool data/clustermap.png'
+    PATH_FOR_CLUSTERMAP = 'tool data/output/' + name + '_clustermap.png'
     cluster_grid.savefig(PATH_FOR_CLUSTERMAP)
 
     print('Clustermap saved to ' + PATH_FOR_CLUSTERMAP)
+    if order_rows:
+        row_order = cluster_grid.dendrogram_row.reordered_ind
+    else:
+        row_order = list(range(len(dataframe.index)))
+    
+    if order_columns:
+        column_roder = cluster_grid.dendrogram_col.reordered_ind
+    else:
+        column_roder = list(range(len(dataframe.columns)))
+
+    return row_order, column_roder
 
 
 
 
 
-    print('Plotting')
+def generate_one_heatmap(dataframe, numpy_array, models, datasets, name, order_rows=True, order_columns=True):
+
+    row_order, column_roder = generate_clustermap(dataframe, order_rows=order_rows, order_columns=order_columns,name=name)
+    numpy_array, models, datasets = get_reordered(numpy_array, row_order, column_roder, models, datasets)
+
+    # get the index of the model 'no_transfer_learning'
+    no_tl_index = models.index('no_transfer_learning')
+
+    # make sure it is the last row
+    numpy_array = np.concatenate([numpy_array[:no_tl_index], numpy_array[no_tl_index+1:], numpy_array[no_tl_index:no_tl_index+1]], axis=0)
+    models = models[:no_tl_index] + models[no_tl_index+1:] + models[no_tl_index:no_tl_index+1]
+
+
+
+    print('Plotting heatmap for ' + name )
 
     # make a bigger plot
     fig = plt.figure(figsize=(20, 20))
@@ -118,7 +167,8 @@ def generate_heatmap(config, from_pickle=False):
 
     # Save the heatmap to a file TODO: change it to output again
     #PATH_FOR_HEATMAP = 'tool data/output/heatmap.png'
-    PATH_FOR_HEATMAP = './heatmap.png'
+    PATH_FOR_HEATMAP = 'tool data/output/' + name + '_heatmap.png'
     plt.savefig(PATH_FOR_HEATMAP)
 
     print('Heatmap saved to ' + PATH_FOR_HEATMAP)
+
