@@ -29,6 +29,7 @@ def prepare_inputs(config):
 
     if config.tl_data == 'leenay':
         if config.tl_data_category == 'random':
+            print('Preparing random leenay')
             prepare_random_leenay(dir_path)
         else:
             prepare_leenay(dir_path)
