@@ -92,48 +92,37 @@ if __name__ == '__main__':
                 DataHandler = dh_tl.get_data(config, set)
 
 
-                enzymes = ['multi_task']
                 train_types = ['full_tl', 'LL_tl', 'gl_tl', 'no_em_tl', 'no_tl', 'no_pre_train']
-                for enzyme in enzymes:
-                    config.enzyme = enzyme
-                    for train_type in train_types:
-                        if (enzyme in ['esp', 'hf']) and (train_types == 'no_pre_train'):
-                            continue # If there is no pre train data, we dont need to train model for each type of enzyme
-                        # if os.path.exists(f'models/transfer_learning/{config.tl_data}/set{config.set}/DeepHF_old/{config.enzyme}/{train_type}/model_9/model'):
-                        #     continue
-                        print(f'#################### Running {enzyme} with {train_type} model #############################')
-                        config.train_type = train_type
-                        config.epochs = 1000
-                        config.save_model = False
-                        print(f'Running cross_v_HPS for {enzyme} with {train_type} model')
+                config.enzyme = 'multi_task'
+                for train_type in train_types:
+                    print(f'#################### Running {config.enzyme} with {train_type} model #############################')
+                    config.train_type = train_type
+                    config.epochs = 1000
+                    config.save_model = False
 
-                        if config.train_type == 'no_pre_train':
-                            # hps_tl.tl_param_search(config, DataHandler)
-                            config.epochs = 200
-                            config.batch_size = 190
-                            config.init_lr = 0.027
-                            config.optimizer = SGD
-                            opt_epochs = cv_tl.cross_v_HPS(config, DataHandler)
+                    print(f'Running cross_v_HPS for {config.enzyme} with {train_type} model')
+                    if config.train_type == 'no_pre_train':
+                        config.epochs = 200
+                        config.batch_size = 190
+                        config.init_lr = 0.027
+                        config.optimizer = SGD
+                        opt_epochs = cv_tl.cross_v_HPS(config, DataHandler)
+                        config.epochs = opt_epochs
+                    elif config.train_type == 'no_tl':
+                        config.epochs = 0
+                    else:
+                        opt_epochs = cv_tl.cross_v_HPS(config, DataHandler)
+                        config.epochs = opt_epochs
 
-                            config.epochs = opt_epochs
+                    print(f'Running full_train for {config.enzyme} with {train_type} model')
+                    config.save_model = True
+                    mean = cv_tl.train_10(config, DataHandler)
 
+                    print(f'Running ensemble for {config.enzyme} with {train_type} model')
+                    spearmanr = ensemble_util_tl.train_ensemble(config, DataHandler)
 
-                        elif config.train_type == 'no_tl':
-                            config.epochs = 0
-                        else:
-                            opt_epochs = cv_tl.cross_v_HPS(config, DataHandler)
-                            # opt_epochs = 1 # TODO - delete (debug line)
-                            config.epochs = opt_epochs
-
-                        print(f'Running full_train for {enzyme} with {train_type} model')
-                        config.save_model = True
-                        mean = cv_tl.train_10(config, DataHandler)
-
-                        print(f'Running ensemble for {enzyme} with {train_type} model')
-                        spearmanr = ensemble_util_tl.train_ensemble(config, DataHandler)
-
-                        testing_util_tl.save_results(config, enzyme, train_type, mean, spearmanr)
-                        keras.backend.clear_session()
+                    testing_util_tl.save_results(config, config.enzyme, train_type, mean, spearmanr)
+                    keras.backend.clear_session()
 
     if config.simulation_type == 'postprocess':
         postprocess_tl.postprocess(config)
