@@ -1,0 +1,7 @@
+docker build -t tool .
+
+docker run -it tool -h
+
+docker ps -a
+
+docker cp 1ec2a7a66d82:"/app/tool data/output" ./output_container

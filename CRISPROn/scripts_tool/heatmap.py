@@ -16,10 +16,11 @@ def generate_heatmap(config, from_pickle=False):
 
 
 
-    models_and_datasets = utils.get_all_models()
-    models_and_datasets.sort()
-    datasets = models_and_datasets
-    models = models_and_datasets + ['no_transfer_learning']
+    models = utils.get_all_models()
+    models.sort()
+    datasets = utils.get_all_datasets()
+    datasets.sort()
+    models.append('no_transfer_learning')
     models_spearmans = {}
 
     if not from_pickle:

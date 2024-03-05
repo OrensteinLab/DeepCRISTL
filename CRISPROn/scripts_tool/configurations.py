@@ -23,6 +23,13 @@ def get_parser():
                          type=str,
                            default=None,
                            help="name of the model to be used for prediction, is used with conjunction with --input_file")
+    
+    parser.add_argument('--recalculate_spearmans',
+                        action='store_true',
+                          help="Recalcualte spearmans if making a heatmap")
+    
+
+
   
 
 
