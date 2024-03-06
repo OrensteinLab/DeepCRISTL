@@ -117,13 +117,12 @@ if __name__ == '__main__':
 
 
         from scripts_tool import models_util
-        models = utils.get_all_models() + ['no transfer learning']
+        #models = utils.get_all_models() + ['no transfer learning']
+        models = utils.get_all_models()
         datasets = utils.get_all_datasets()
-        # for now only one TODO: change this
-        models = models[:5]
-        datasets = datasets[:5]
 
         for model in models:
+            saliency_dfs = []
             print(f'\n\n\nCalculating saliency maps for model trained on {model}')
             if model == 'no transfer learning':
                 ensemble_models = models_util.load_no_tl_models()
@@ -131,61 +130,57 @@ if __name__ == '__main__':
                 config.model_to_use = model
                 ensemble_models = models_util.load_tl_models(config)
 
-            first_model = ensemble_models[0]
+            for used_model in ensemble_models:
 
-            DataHandler = dh.get_data_from_dataset(model)
-            x = DataHandler['X_test']
-            dg = DataHandler['dg_test']
-            combined_data = [x, dg]
-            # make into a tensor
-            combined_data_tensors = [tf.convert_to_tensor(x) for x in combined_data]
+                DataHandler = dh.get_data_from_dataset(model)
+                x = DataHandler['X_test']
+                dg = DataHandler['dg_test']
+                combined_data = [x, dg]
+                # make into a tensor
+                combined_data_tensors = [tf.convert_to_tensor(x) for x in combined_data]
 
-           # Use a persistent GradientTape
-            with tf.GradientTape(persistent=True) as tape:
-                # Watch each input tensor
-                for data_tensor in combined_data_tensors:
-                    tape.watch(data_tensor)
+            # Use a persistent GradientTape
+                with tf.GradientTape(persistent=True) as tape:
+                    # Watch each input tensor
+                    for data_tensor in combined_data_tensors:
+                        tape.watch(data_tensor)
+                    
+                    # Assuming your model takes a list of tensors as input
+                    predictions = used_model(combined_data_tensors)
+                    
+                    # Compute a scalar loss
+                    loss = tf.reduce_mean(predictions)
+
+                # Compute gradients with respect to each input tensor
+                gradients_x = tape.gradient(loss, combined_data_tensors[0])
+                gradients_dg = tape.gradient(loss, combined_data_tensors[1])
+
+                # Free up resources used by the persistent tape
+                del tape
+
+                # average the gradients for each sequence
+                gradients_x = np.mean(gradients_x, axis=0)
+                gradients_dg = np.mean(gradients_dg)
+
+                saliency_map = gradients_x 
                 
-                # Assuming your model takes a list of tensors as input
-                predictions = first_model(combined_data_tensors)
+                # print it with only 2 digits after tghe decimal point
+                for i in range(saliency_map.shape[0]):
+                    print(f'{i}:', end='\t')
+                    for index, letter in enumerate(['A', 'C', 'G', 'T']):
+                        value = saliency_map[i][index]
+                        if value < 0:
+                            print(f'{letter}: {saliency_map[i][index]:.2f}', end='\t')
+                        else:
+                            print(f'{letter}: {saliency_map[i][index]:.2f} ', end='\t')
+                    print()
+
+                saliency_df = pd.DataFrame(saliency_map, columns=['A', 'C', 'G', 'T'])
+                saliency_dfs.append(saliency_df)
+
+            # average the saliency maps
+            saliency_df = pd.concat(saliency_dfs).groupby(level=0).mean()
                 
-                # Compute a scalar loss
-                loss = tf.reduce_mean(predictions)
-
-            # Compute gradients with respect to each input tensor
-            gradients_x = tape.gradient(loss, combined_data_tensors[0])
-            gradients_dg = tape.gradient(loss, combined_data_tensors[1])
-
-            # Free up resources used by the persistent tape
-            del tape
-
-            # Visualize or process your gradients
-            #print("Gradients with respect to x:", gradients_x)
-            #print("Gradients with respect to dg:", gradients_dg)
-
-            # average the gradients for each sequence
-            gradients_x = np.mean(gradients_x, axis=0)
-            gradients_dg = np.mean(gradients_dg)
-
-            # negate it to get the saliency map
-            saliency_map = -gradients_x
-            # multiply by e6
-            saliency_map = saliency_map * 1e6
-
-            saliency_map = gradients_x # TODO: CHANGE LATER
-            
-            # print it with only 2 digits after tghe decimal point
-            for i in range(saliency_map.shape[0]):
-                print(f'{i}:', end='\t')
-                for index, letter in enumerate(['A', 'C', 'G', 'T']):
-                    value = saliency_map[i][index]
-                    if value < 0:
-                        print(f'{letter}: {saliency_map[i][index]:.2f}', end='\t')
-                    else:
-                        print(f'{letter}: {saliency_map[i][index]:.2f} ', end='\t')
-                print()
-
-            saliency_df = pd.DataFrame(saliency_map, columns=['A', 'C', 'G', 'T'])
 
 
             import logomaker 
@@ -194,7 +189,10 @@ if __name__ == '__main__':
 
             # Style the logo as needed
             logo.style_xticks(rotation=90, fmt='%d', anchor=0) # Optional: style x-ticks if sequence positions are important
+            labels = ['-4', '-3', '-2', '-1', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13',
+                       '14', '15', '16', '17', '18', '19', '20', 'N', 'G', 'G', '24', '25','26']
             logo.ax.set_ylabel("Saliency (importance)") # Adjust label as needed
+            logo.ax.set_xticklabels(labels, rotation=90)
 
             # Save the logo to a file in the tool data/output folder
             logo.fig.savefig(f'tool data/output/saliency_map_{model}.png', dpi=300, bbox_inches='tight')
@@ -203,8 +201,6 @@ if __name__ == '__main__':
 
 
 
-            #print("Gradients with respect to x:\n", gradients_x)
-            #print("Gradients with respect to dg:\n", gradients_dg)
  
             
 
