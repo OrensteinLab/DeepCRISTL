@@ -30,7 +30,7 @@ python 3.6 -u ./main.py -s_type cross_v --enzyme wt
 2. Download the fix files from github - all the .tab files in https://github.com/maximilianh/crisporPaper/tree/master/effData
 3. Put them in data/main/dataframes/CrisprOR fixes
 4. run fix_supp.py
-5. For each experiment run  python 3.6 -u ./main_tl.py -s_type preprocess --tl_data xu2015TrainHl60 --tl_data_category U6T7 
+5. For each experiment run  python 3.6 -u ./main_tl.py -s_type preprocess --tl_data ALL_U6T7_DATA --tl_data_category U6T7 
 Note that in our experiments we put everything in the U6T7 category for convinicence.
 
 

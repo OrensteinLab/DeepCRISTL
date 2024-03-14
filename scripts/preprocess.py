@@ -14,7 +14,7 @@ import math
 #             full_df = full_df.iloc[:20]
 #             split_enzymes_dataframe(full_df, row_reads=True)
 #         elif config.data_source == 'old':
-#             full_df = pd.read_csv('data/main_dataframes/suplementry2_with_bio.csv')
+#             full_df = pd.read_csv('data/main_dataframes/supplementary2_with_bio.csv')
 #             split_enzymes_dataframe(full_df, row_reads=False)
 #
 #             a=0
@@ -97,10 +97,10 @@ def prepare_old_data(data_columns):
     if not os.path.exists(dir_path):
         os.makedirs(dir_path)
 
-    if os.path.exists('data/main_dataframes/suplementry2_with_bio.csv'):
-        full_df = pd.read_csv('data/main_dataframes/suplementry2_with_bio.csv')
+    if os.path.exists('data/main_dataframes/supplementary2_with_bio.csv'):
+        full_df = pd.read_csv('data/main_dataframes/supplementary2_with_bio.csv')
     else:
-        df = pd.read_csv('data/main_dataframes/suplementry2.csv')
+        df = pd.read_csv('data/main_dataframes/supplementary2.csv')
 
         feature_options = {
             "testing_non_binary_target_name": 'ranks',
@@ -121,7 +121,7 @@ def prepare_old_data(data_columns):
             reindexed_feature_df = feature_sets[feature]
             reindexed_feature_df.reset_index(inplace=True, drop=True)
             df = pd.concat([df, reindexed_feature_df], axis=1)
-        df.to_csv('data/main_dataframes/suplementry2_with_bio.csv', index=False)
+        df.to_csv('data/main_dataframes/supplementary2_with_bio.csv', index=False)
         full_df = df
 
     full_df = full_df[data_columns]

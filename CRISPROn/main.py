@@ -15,8 +15,15 @@ if __name__ == '__main__':
     config = cfg.get_parser()
 
     if config.simulation_type == 'preprocess':
-        preprocess.prepare_inputs(config)
-        print('Preprocessing done')
+        if config.tl_data == 'ALL_U6T7_DATA':
+            datasets = ['chari2015Train293T','doench2014-Hs','doench2014-Mm','doench2016_hg19','hart2016-Hct1162lib1Avg','hart2016-HelaLib1Avg','hart2016-HelaLib2Avg','hart2016-Rpe1Avg','morenoMateos2015','xu2015TrainHl60','xu2015TrainKbm7']
+        else:
+            datasets = [config.tl_data]
+
+        for dataset in datasets:
+            config.tl_data = dataset
+            print(f'Running preprocess for {config.tl_data} dataset')
+            preprocess.prepare_inputs(config)
 
     if config.simulation_type == 'full_sim':
         print(f'Running full simulation for {config.tl_data} dataset')

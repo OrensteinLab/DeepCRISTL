@@ -91,7 +91,7 @@ def calculate_hamming_distance_matix(df):
     return hamming_matrix
 
 
-def apply_neighbore_filter(hamming_matrix, max_distance):
+def apply_neighbor_filter(hamming_matrix, max_distance):
     print('Applying neighbor filter...')
     hamming_matrix[hamming_matrix <= max_distance] = 1
     hamming_matrix[hamming_matrix > max_distance] = 0
@@ -277,7 +277,7 @@ def remove_incomplete_rows(df):
 # Takes a dataframe and redistributes it to train, val and test for a TL dataset
 def redistribute_tl_data(df, seed):
     hamming_matrix = calculate_hamming_distance_matix(df)
-    neighborehood_matrix = apply_neighbore_filter(hamming_matrix, max_distance=MAX_DISTANCE)
+    neighborehood_matrix = apply_neighbor_filter(hamming_matrix, max_distance=MAX_DISTANCE)
     sets = get_sets(neighborehood_matrix)
     train, test = random_train_test_split(df, sets, test_ratio=0.2, seed=seed)
     train, val = train_val_split(train, val_ratio=0.2)
@@ -299,16 +299,22 @@ def main():
         train, val = train_val_split(train, val_ratio=0.1)
         save_files(train, val, test, remove_tl_leakage=True)
     else:
-        if check_neighborehood_matrix_missing():
-            if check_hamming_matrix_missing():
-                combined_df = combine_data_files(REMOVE_TL_LEAKAGE)
-                hamming_matrix = calculate_hamming_distance_matix(combined_df)
-                save_hamming_matrix(hamming_matrix)
-            hamming_matrix = load_hamming_matrix()
-            neighborehood_matrix = apply_neighbore_filter(hamming_matrix, max_distance=MAX_DISTANCE)
-            save_neighborehood_matrix(neighborehood_matrix)
+        # if check_neighborehood_matrix_missing():
+        #     if check_hamming_matrix_missing():
+        #         combined_df = combine_data_files(REMOVE_TL_LEAKAGE)
+        #         hamming_matrix = calculate_hamming_distance_matix(combined_df)
+        #         save_hamming_matrix(hamming_matrix)
+        #     hamming_matrix = load_hamming_matrix()
+        #     neighborehood_matrix = apply_neighbor_filter(hamming_matrix, max_distance=MAX_DISTANCE)
+        #     save_neighborehood_matrix(neighborehood_matrix)
 
-        neighborehood_matrix = load_neighborehood_matrix()
+        # neighborehood_matrix = load_neighborehood_matrix()
+
+        combined_df=  combine_data_files(REMOVE_TL_LEAKAGE)
+        hamming_matrix = calculate_hamming_distance_matix(combined_df)
+        neighborehood_matrix = apply_neighbor_filter(hamming_matrix, max_distance=MAX_DISTANCE)
+
+
         # print some of the neighborehood matrix
         if check_sets_missing():
             sets = get_sets(neighborehood_matrix)
