@@ -14,30 +14,21 @@ Follow the guide in this exact order.
 9. Take the files from the output folder and put them in go to data/pre_train/DeepHF_old
 10. Run python3.6 -u ./main.py -s_type preprocess 
 
-# CRISPRon
 
-
-
-# Leenay for DeepHF
+# Leenay and U6T7 For DeepHF
 
 1. Download leenay_full_data.csv from XXXXXXXXXXXXX
-2. put it in data/main_dataframes/
-3. run python 3.6 -u ./main_tl.py -s_type preprocess --tl_data leenay --tl_data_category leenay 
-4. In the CRISPRON/ folder run 
-
-# U6T7 for DeepHF
-
-1. Download the supplementary table from CrisprON - a file named "13059_2016_1012_MOESM14_ESM.tsv" https://springernature.figshare.com/articles/dataset/Additional_file_14_of_Evaluation_of_off-target_and_on-target_scoring_algorithms_and_integration_into_the_guide_RNA_selection_tool_CRISPOR/4466045
-2. Download the fix files from github - all the .tab files in https://github.com/maximilianh/crisporPaper/tree/master/effData
-3. Put them in data/main/dataframes/CrisprOR fixes
-4. run python3.6 -u fix_supp.py
-5. run python 3.6 -u ./main_tl.py -s_type preprocess --tl_data ALL_U6T7_DATA --tl_data_category U6T7 
+2. Download the supplementary table from CrisprON - a file named "13059_2016_1012_MOESM14_ESM.tsv" https://springernature.figshare.com/articles/dataset/Additional_file_14_of_Evaluation_of_off-target_and_on-target_scoring_algorithms_and_integration_into_the_guide_RNA_selection_tool_CRISPOR/4466045
+3. put both files in data/main_dataframes/
+4. Download the fix files from github - all the .tab files in https://github.com/maximilianh/crisporPaper/tree/master/effData
+5. Put them in data/main/dataframes/CrisprOR fixes
+6. run python3.6 -u fix_supp.py
+7. run python 3.6 -u ./main_tl.py -s_type preprocess --tl_data leenay --tl_data_category leenay 
+8. run python 3.6 -u ./main_tl.py -s_type preprocess --tl_data ALL_U6T7_DATA --tl_data_category U6T7 
 
 
-# Leenay for CRISPRon
+# Leenay and U6T7 For DeepHF for CRISPRon
 1. Go to the CRISPROn folder
 2. run python 3.6 -u ./main.py -s_type preprocess --tl_data leenay --tl_data_category leenay 
+3. run python 3.6 -u ./main.py -s_type preprocess --tl_data ALL_U6T7_DATA --tl_data_category U6T7 
 
-# U6T7 for CRISPRon
-1. Go to the CRISPROn folder
-2. run python 3.6 -u ./main.py -s_type preprocess --tl_data ALL_U6T7_DATA --tl_data_category U6T7 
