@@ -17,6 +17,8 @@ if __name__ == '__main__':
     if config.simulation_type == 'preprocess':
         if config.tl_data == 'ALL_U6T7_DATA':
             datasets = ['chari2015Train293T','doench2014-Hs','doench2014-Mm','doench2016_hg19','hart2016-Hct1162lib1Avg','hart2016-HelaLib1Avg','hart2016-HelaLib2Avg','hart2016-Rpe1Avg','morenoMateos2015','xu2015TrainHl60','xu2015TrainKbm7']
+        elif config.tl_data == 'ALL_ORIGINAL_DATA':
+            datasets = ['leenay', 'chari2015Train293T','doench2014-Hs','doench2014-Mm','doench2016_hg19','hart2016-Hct1162lib1Avg','hart2016-HelaLib1Avg','hart2016-HelaLib2Avg','hart2016-Rpe1Avg','morenoMateos2015','xu2015TrainHl60','xu2015TrainKbm7']
         else:
             datasets = [config.tl_data]
 
@@ -26,38 +28,45 @@ if __name__ == '__main__':
             preprocess.prepare_inputs(config)
 
     if config.simulation_type == 'full_sim':
-        print(f'Running full simulation for {config.tl_data} dataset')
+        if config.tl_data == 'ALL_ORIGINAL_DATA':
+            datasets = ['leenay', 'chari2015Train293T','doench2014-Hs','doench2014-Mm','doench2016_hg19','hart2016-Hct1162lib1Avg','hart2016-HelaLib1Avg','hart2016-HelaLib2Avg','hart2016-Rpe1Avg','morenoMateos2015','xu2015TrainHl60','xu2015TrainKbm7']
+        else:
+            datasets = [config.tl_data]
 
-        train_types = ['full_tl', 'LL_tl', 'gl_tl', 'no_tl', 'no_pre_train']
-        for set in range(5):
-            print(f'Running on set {set}')
-            config.set = set
-            DataHandler = dh.get_data(config, set)
+        for dataset in datasets:
+            config.tl_data = dataset
+            print(f'Running full simulation for {config.tl_data} dataset')
+
+            train_types = ['full_tl', 'LL_tl', 'gl_tl', 'no_tl', 'no_pre_train']
+            for set in range(5):
+                print(f'Running on set {set}')
+                config.set = set
+                DataHandler = dh.get_data(config, set)
 
 
-            for train_type in train_types:
-                print(f'#################### Running {train_type} model #############################')
-                config.train_type = train_type
-                config.save_model = False
-                print(f'Running cross_v_HPS with {train_type} model')
-                if config.train_type == 'no_tl':
-                    config.epochs = 0
-                else:
-                    config.epochs = 100
-                    opt_epochs = cv_tl.cross_v_HPS(config, DataHandler)
-                    config.epochs = opt_epochs
-                    # config.epochs = 100
-                    # hps.param_search(config, DataHandler)
+                for train_type in train_types:
+                    print(f'#################### Running {train_type} model #############################')
+                    config.train_type = train_type
+                    config.save_model = False
+                    print(f'Running cross_v_HPS with {train_type} model')
+                    if config.train_type == 'no_tl':
+                        config.epochs = 0
+                    else:
+                        config.epochs = 100
+                        opt_epochs = cv_tl.cross_v_HPS(config, DataHandler)
+                        config.epochs = opt_epochs
+                        # config.epochs = 100
+                        # hps.param_search(config, DataHandler)
 
-                print(f'Running full_train with {train_type} model')
-                config.save_model = True
-                mean = cv_tl.train_6(config, DataHandler)
+                    print(f'Running full_train with {train_type} model')
+                    config.save_model = True
+                    mean = cv_tl.train_6(config, DataHandler)
 
-                print(f'Running ensemble with {train_type} model')
-                spearmanr = ensemble_util.train_ensemble(config, DataHandler)
+                    print(f'Running ensemble with {train_type} model')
+                    spearmanr = ensemble_util.train_ensemble(config, DataHandler)
 
-                testing_util.save_results(config, set, train_type, mean, spearmanr)
-                keras.backend.clear_session()
+                    testing_util.save_results(config, set, train_type, mean, spearmanr)
+                    keras.backend.clear_session()
 
             
         print('Full simulation done')

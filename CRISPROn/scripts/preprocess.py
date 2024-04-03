@@ -12,16 +12,15 @@ import pickle
 
 
 def prepare_inputs(config):
+    
     dir_path = f'data/tl_train/{config.tl_data_category}/{config.tl_data}/'
-
-    if config.tl_data_category == 'U6T7':
-        prepare_u6_t7_files(config, dir_path)
-
-    if config.tl_data_category == 'leenay':
+    
+    if config.tl_data == 'leenay':
         prepare_leenay_files(config, dir_path)
+    elif config.tl_data_category == 'U6T7':
+        prepare_u6_t7_files(config, dir_path)
+        
 
-    if config.tl_data_category == 'crispr_il':
-        prepare_crispr_il(config, dir_path)
 
 
 
@@ -166,66 +165,7 @@ def prepare_leenay_files(config, dir_path):
             merged = pd.merge(dataset_df, eng_df, how='inner', on=['name'])
             merged.to_csv(dir_path + f'set{set}/{dataset}_crispr_on.csv', index=False)
 
-def prepare_crispr_il(config, dir_path):
-    if os.path.exists(dir_path + 'set4/test_crispr_on.csv'):
-        return
-    if not os.path.exists(dir_path):
-        os.makedirs(dir_path)
 
-    if os.path.exists(dir_path + 'full_df.csv'):
-        df = pd.read_csv(dir_path + 'full_df.csv')
-    else:
-        datasets = ['train', 'valid', 'test']
-
-
-        df = pd.read_csv(f'data/main_dataframes/crispr_il/{config.tl_data}.tsv', sep='\t')
-        df.rename(columns={'Unnamed: 0': 'guide'}, inplace=True)
-
-
-        seq = df['sgRNA_seq_0_char']
-        for i in range(1, 23):
-            col = f'sgRNA_seq_{i}_char'
-            seq = seq + df[col]
-        df['23mer'] = seq
-        df['21mer'] = df['23mer'].map(lambda x: x[:21])
-
-        up_seq = df['upstream_seq_16_char']
-        for i in range(17, 20):
-            col = f'upstream_seq_{i}_char'
-            up_seq = up_seq + df[col]
-        df['upstream'] = up_seq
-
-        down_seq = df['downstream_seq_0_char']
-        for i in range(1, 3):
-            col = f'downstream_seq_{i}_char'
-            down_seq = down_seq + df[col]
-        df['downstream'] = down_seq
-
-
-        df['30mer'] = df['downstream'] + df['23mer'] + df['upstream']
-
-        mean_eff_col_name = 'efficiency'
-        df.rename(columns={mean_eff_col_name: 'mean_eff'}, inplace=True)
-
-        pipe.read_energy_parameters('data/model/energy_dics.pkl')
-        global RNAFOLD_EXE
-        RNAFOLD_EXE = 'RNAfold'
-
-        df["CRISPRoff_score"] = df.apply(lambda x:
-                                         pipe.get_eng(x['23mer'], x['23mer'], pipe.calcRNADNAenergy, GU_allowed=False,
-                                                 pos_weight=True, pam_corr=True, grna_folding=True, dna_opening=True,
-                                                 dna_pos_wgh=False), axis=1)
-        df.to_csv(dir_path + 'full_df.csv', index=False)
-
-    eng_df = df[['21mer', '30mer', 'CRISPRoff_score']]
-    datasets = ['train_valid', 'train', 'valid', 'test']
-    for set in range(5):
-        for dataset in datasets:
-            dataset_df = pd.read_csv(dir_path + f'set{set}/{dataset}.csv')
-            merged = pd.merge(dataset_df, eng_df, how='inner', on=['21mer'])
-            merged.to_csv(dir_path + f'set{set}/{dataset}_crispr_on.csv', index=False)
-
-    a=0
 
 
 def prepare_sequences(dir_path):

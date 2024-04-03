@@ -28,14 +28,7 @@ def prepare_inputs(config):
     dir_path = f'data/tl_train/{config.tl_data_category}/{config.tl_data}/'
 
     if config.tl_data == 'leenay':
-        if config.tl_data_category == 'random':
-            print('Preparing random leenay')
-            prepare_random_leenay(dir_path)
-        elif config.tl_data_category == 'recalculate_features':
-            print('Preparing recalculated leenay')
-            prepare_recalculated_leenay(dir_path)
-        else:
-            prepare_leenay(dir_path)
+        prepare_recalculated_leenay(dir_path)
 
     elif config.tl_data_category == 'U6T7':
         prepare_u6_t7_files(config, dir_path)
