@@ -286,7 +286,7 @@ def redistribute_tl_data(df, seed):
 
 
 
-def redistribute_dhf_pretrain_data(df, seed):
+def redistribute_dhf_pretrain_data(df):
     hamming_matrix = calculate_hamming_distance_matix(df)
     neighborehood_matrix = apply_neighbor_filter(hamming_matrix, max_distance=MAX_DISTANCE)
     sets = get_sets(neighborehood_matrix)

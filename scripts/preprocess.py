@@ -88,20 +88,6 @@ def prepare_inputs(config):
             prepare_sequences(reads_sum=True, dir_path='data/pre_train/DeepHF_full/', old=False)
 
 
-def split_data_set(df, dir_path):
-    for i in range(5):
-        print(f'Creating set {i} based on seed {i}')
-        train_df, valid_df, test_df = redistribute_split.redistribute_tl_data(df, seed=i)
-        train_val_df = pd.concat([train_df, valid_df], axis=0)
-
-       
-        perm_path = dir_path + f'set{i}/'
-        os.mkdir(perm_path)
-        test_df.to_csv(perm_path + 'test.csv', index=False)
-        train_val_df.to_csv(perm_path + 'train_valid.csv', index=False)
-        valid_df.to_csv(perm_path + 'valid.csv', index=False)
-        train_df.to_csv(perm_path + 'train.csv', index=False)
-
 
 def prepare_old_data(data_columns):
     dir_path = 'data/pre_train/DeepHF_old/'
