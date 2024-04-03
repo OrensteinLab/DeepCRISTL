@@ -33,6 +33,8 @@ if __name__ == '__main__':
     if config.simulation_type == 'preprocess':
         if config.tl_data == 'ALL_U6T7_DATA':
             datasets = ['chari2015Train293T','doench2014-Hs','doench2014-Mm','doench2016_hg19','hart2016-Hct1162lib1Avg','hart2016-HelaLib1Avg','hart2016-HelaLib2Avg','hart2016-Rpe1Avg','morenoMateos2015','xu2015TrainHl60','xu2015TrainKbm7']
+        if config.tl_data == 'ALL_ORIGINAL_DATA':
+            datasets = ['leenay', 'chari2015Train293T','doench2014-Hs','doench2014-Mm','doench2016_hg19','hart2016-Hct1162lib1Avg','hart2016-HelaLib1Avg','hart2016-HelaLib2Avg','hart2016-Rpe1Avg','morenoMateos2015','xu2015TrainHl60','xu2015TrainKbm7']
         else:
             datasets = [config.tl_data]
 

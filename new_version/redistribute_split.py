@@ -214,9 +214,9 @@ def train_test_split(df, sets, test_ratio):
         normalized_test_size = len(test) * train_ratio
 
         if normalized_train_size < normalized_test_size:
-            train = train._append(df.iloc[list(sequence_set)])
+            train = train.append(df.iloc[list(sequence_set)])
         else:
-            test = test._append(df.iloc[list(sequence_set)])
+            test = test.append(df.iloc[list(sequence_set)])
 
     return train, test
 
@@ -295,55 +295,3 @@ def redistribute_dhf_pretrain_data(df):
 
     return train, val, test
 
-
-
-def main():
-    # check args length
-    if len(sys.argv)==2 and sys.argv[1] == 'remove_tl_leakage':
-        REMOVE_TL_LEAKAGE = True
-    else:
-        REMOVE_TL_LEAKAGE = False
-
-    if REMOVE_TL_LEAKAGE:
-        train = combine_data_files(remove_tl_leakage=True)
-        test = pd.DataFrame(columns=train.columns)
-        train, val = train_val_split(train, val_ratio=0.1)
-        save_files(train, val, test, remove_tl_leakage=True)
-    else:
-        # if check_neighborehood_matrix_missing():
-        #     if check_hamming_matrix_missing():
-        #         combined_df = combine_data_files(REMOVE_TL_LEAKAGE)
-        #         hamming_matrix = calculate_hamming_distance_matix(combined_df)
-        #         save_hamming_matrix(hamming_matrix)
-        #     hamming_matrix = load_hamming_matrix()
-        #     neighborehood_matrix = apply_neighbor_filter(hamming_matrix, max_distance=MAX_DISTANCE)
-        #     save_neighborehood_matrix(neighborehood_matrix)
-
-        # neighborehood_matrix = load_neighborehood_matrix()
-
-        combined_df=  combine_data_files(REMOVE_TL_LEAKAGE)
-        hamming_matrix = calculate_hamming_distance_matix(combined_df)
-        neighborehood_matrix = apply_neighbor_filter(hamming_matrix, max_distance=MAX_DISTANCE)
-
-
-        # print some of the neighborehood matrix
-        if check_sets_missing():
-            sets = get_sets(neighborehood_matrix)
-            save_sets(sets)
-        
-        sets = load_sets()
-
-        check_stats(neighborehood_matrix, sets)
-
-
-        combined_df = combine_data_files()
-        train, test = train_test_split(combined_df, sets, test_ratio=0.15)
-        test = remove_incomplete_rows(test)
-        train, val = train_val_split(train, val_ratio=0.1)
-
-        save_files(train, val, test)
-
-
-
-if __name__ == '__main__':
-    main()
