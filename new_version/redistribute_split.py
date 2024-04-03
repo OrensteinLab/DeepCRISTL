@@ -39,41 +39,6 @@ def get_df_from_folder(path):
     df = pd.concat([df, df_train, df_valid])
     return df
 
-def combine_data_files(remove_tl_leakage=False):
-    print('Combining data files...')
-
-
-
-    files = ['test.csv', 'train.csv', 'valid.csv']
-    df = pd.DataFrame()
-    for file in files:
-        df = df._append(pd.read_csv(file))
-
-    # Remove rows in df that are distance 4 or less from tl_dataframes in the field '21mer' usign hammings distance
-    if remove_tl_leakage:
-        print('Removing TL leakage...')
-        new_df = pd.DataFrame()
-        tl_folders, tl_names = get_folders(TL_BASE_PATH)
-        tl_folders = [get_first_set(TL_BASE_PATH + folder) for folder in tl_folders]
-        tl_dataframes = [get_df_from_folder(folder) for folder in tl_folders]
-        removed = 0
-        for sequence in df['21mer'].values:
-            if not any(lev.distance(sequence, tl_sequence) <= MAX_DISTANCE for tl_df in tl_dataframes for tl_sequence in tl_df['21mer'].values):
-                new_df = new_df._append(df[df['21mer'] == sequence])
-            else:
-                removed += 1
-
-        df = new_df
-        print('Removed {} rows'.format(removed))
-
-
-
-    # sort by index
-    df = df.sort_values(by=['21mer'])
-
-
-
-    return df
 
 def calculate_hamming_distance_matix(df):
     print('Calculating hamming distance matrix...')
@@ -98,23 +63,6 @@ def apply_neighbor_filter(hamming_matrix, max_distance):
 
     return hamming_matrix
 
-def check_stats(neighborehood_matrix, sets):
-    print('Checking stats...')
-    neighbores_per_row = np.sum(neighborehood_matrix, axis=1) 
-
-    plt.hist(neighbores_per_row, bins=100)
-    plt.title('Neighbor distribution, row-legth: {}'.format(len(neighborehood_matrix)))
-    plt.savefig('neighbor_distribution.png')
-
-    # clear
-    plt.clf()
-
-
-    # Show the size of the sets using a histogram
-    set_sizes = [len(s) for s in sets]
-    plt.hist(set_sizes, bins=20)
-    plt.title('Set size distribution, number of sets: {}'.format(len(sets)))
-    plt.savefig('set_size_distribution.png')
 
 
 
@@ -135,25 +83,6 @@ def get_sets(neighborehood_matrix):
 
     return sets
 
-def save_sets (sets):
-    print('Saving sets...')
-    # save with pickle
-    with open('sets.pickle', 'wb') as f:
-        pickle.dump(sets, f)
-
-
-
-def load_sets():
-    print('Loading sets...')
-    with open('sets.pickle', 'rb') as f:
-        sets = pickle.load(f)
-
-    return sets
-
-
-def check_sets_missing():
-    return not os.path.isfile('sets.pickle')
-  
 
 def get_bfs(neighborehood_matrix, start_index):
     # Returns a set of all sequences that are connected to the start_index in the neighborehood_matrix
@@ -171,31 +100,6 @@ def get_bfs(neighborehood_matrix, start_index):
                 queue.append(i)
 
     return visited
-
-def save_hamming_matrix(hamming_matrix):
-    print('Saving hamming matrix...')
-    np.save('hamming_matrix', hamming_matrix)
-
-def load_hamming_matrix():
-    print('Loading hamming matrix...')
-    return np.load('hamming_matrix.npy')
-
-def check_hamming_matrix_missing():
-    return not os.path.isfile('hamming_matrix.npy')
-
-def check_neighborehood_matrix_missing():
-    return not os.path.isfile('neighborehood_matrix.npy')
-
-def save_neighborehood_matrix(neighborehood_matrix):
-    neighborehood_matrix = neighborehood_matrix.astype(bool)
-    print('Saving neighborehood matrix...')
-    np.save('neighborehood_matrix', neighborehood_matrix)
-
-def load_neighborehood_matrix():
-    print('Loading neighborehood matrix...')
-    return np.load('neighborehood_matrix.npy')
-
-
 
 
 def train_test_split(df, sets, test_ratio):
@@ -251,23 +155,7 @@ def train_val_split(df, val_ratio):
 
     return train, val
 
-def save_files(train, val, test, remove_tl_leakage=False):
 
-    # Order by index
-    train = train.sort_values(by=['21mer'])
-    val = val.sort_values(by=['21mer'])
-    if not remove_tl_leakage:
-        test = test.sort_values(by=['21mer'])
-
-
-    # create folder
-    if not os.path.exists('output'):
-        os.makedirs('output')
-    
-    # save files
-    train.to_csv('output/train.csv', index=False)
-    val.to_csv('output/valid.csv', index=False)
-    test.to_csv('output/test.csv', index=False)
 
 def remove_incomplete_rows(df):
     df = df.dropna()
