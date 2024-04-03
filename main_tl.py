@@ -41,7 +41,7 @@ if __name__ == '__main__':
         for dataset in datasets:
             config.tl_data = dataset
             print(f'Running preprocess for {config.tl_data} dataset')
-            preprocess_tl.preprocess(config)
+            preprocess_tl.prepare_inputs(config)
 
     if config.simulation_type == 'train':
         config.epochs = 500
