@@ -3,6 +3,7 @@ import os
 import numpy as np
 import pickle
 from scripts import feature_util
+from new_version import redistribute_split
 import math
 
 # def create_dataframes(config):
@@ -87,7 +88,19 @@ def prepare_inputs(config):
             prepare_sequences(reads_sum=True, dir_path='data/pre_train/DeepHF_full/', old=False)
 
 
+def split_data_set(df, dir_path):
+    for i in range(5):
+        print(f'Creating set {i} based on seed {i}')
+        train_df, valid_df, test_df = redistribute_split.redistribute_tl_data(df, seed=i)
+        train_val_df = pd.concat([train_df, valid_df], axis=0)
 
+       
+        perm_path = dir_path + f'set{i}/'
+        os.mkdir(perm_path)
+        test_df.to_csv(perm_path + 'test.csv', index=False)
+        train_val_df.to_csv(perm_path + 'train_valid.csv', index=False)
+        valid_df.to_csv(perm_path + 'valid.csv', index=False)
+        train_df.to_csv(perm_path + 'train.csv', index=False)
 
 
 def prepare_old_data(data_columns):
@@ -100,7 +113,7 @@ def prepare_old_data(data_columns):
     if os.path.exists('data/main_dataframes/supplementary2_with_bio.csv'):
         full_df = pd.read_csv('data/main_dataframes/supplementary2_with_bio.csv')
     else:
-        df = pd.read_csv('data/main_dataframes/supplementary2.csv')
+        df = pd.read_csv('data/main_dataframes/dhf_pretrain.csv')
 
         feature_options = {
             "testing_non_binary_target_name": 'ranks',
@@ -130,22 +143,15 @@ def prepare_old_data(data_columns):
         name_dict[bio_name] = f'epi{ind+1}'
     full_df.rename(columns=name_dict, inplace=True)
 
+    train_df, val_df, test_df = redistribute_split.redistribute_dhf_pretrain_data(full_df)
 
-    #wt_cond = full_df['wt_mean_eff'].notna()
-    #esp_cond = full_df['esp_mean_eff'].notna()
-    #hf_cond = full_df['hf_mean_eff'].notna()
 
-    #test_df = full_df[wt_cond & esp_cond & hf_cond].sample(frac=0.15).sort_index()
-    test_df = full_df.sample(frac=0.15).sort_index()
-    train_val_df = full_df.drop(test_df.index)
-
-    valid_full_df = train_val_df.sample(frac=0.1).sort_index()
-    train_full_df = train_val_df.drop(valid_full_df.index)
+    train_val_df = pd.concat([train_df, val_df], axis=0)
 
     test_df.to_csv(dir_path + 'test.csv', index=False)
     train_val_df.to_csv(dir_path + 'train_valid.csv', index=False)
-    valid_full_df.to_csv(dir_path + 'valid.csv', index=False)
-    train_full_df.to_csv(dir_path + 'train.csv', index=False)
+    val_df.to_csv(dir_path + 'valid.csv', index=False)
+    train_df.to_csv(dir_path + 'train.csv', index=False)
 
 
 def prepare_dataframes(data_columns):

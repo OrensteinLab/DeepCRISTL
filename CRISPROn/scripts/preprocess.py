@@ -9,109 +9,7 @@ from sklearn.preprocessing import MinMaxScaler
 import CRISPRspec_CRISPRoff_pipeline as pipe
 import pickle
 
-# def get_crispor():
-#     def get_PAM(row):
-#
-#         gRNA_seq = row['gRNA']
-#         full_seq = row['full_seq'][123: 154].upper()
-#
-#         assert gRNA_seq == full_seq[5:-6]
-#         assert full_seq[-5:-3] == 'GG'
-#
-#         return full_seq
-#
-#
-#
-#     def get_avg_indel(row):
-#         assert row['gRNA_x'] == row['gRNA_y']
-#         mean_eff = (row['total_indel_eff_x'] + row['total_indel_eff_y']) / 2
-#         return mean_eff
-#
-#     if os.path.exists('data/edited_dataframes/crispor_full.csv'):
-#         crispor_df = pd.read_csv('data/edited_dataframes/crispor_full.csv')
-#         return crispor_df
-#
-#     indel_D10_df = pd.read_excel('data/main_dataframes/Crispor.xlsx', sheet_name='spCas9_eff_D10-dox')
-#     indel_D10_df = indel_D10_df[['Surrogate ID', 'gRNA', 'total_indel_eff']]
-#
-#     indel_D8_df = pd.read_excel('data/main_dataframes/Crispor.xlsx', sheet_name='spCas9_eff_D8-dox')
-#     indel_D8_df = indel_D8_df[['Surrogate ID', 'gRNA', 'total_indel_eff']]
-#
-#     avg_indel_df = pd.merge(indel_D10_df, indel_D8_df, on='Surrogate ID', how="left")
-#     avg_indel_df.dropna(inplace=True)
-#     avg_indel_df['mean_eff'] = avg_indel_df.apply(lambda x: get_avg_indel(x), axis=1)
-#     avg_indel_df = avg_indel_df[['Surrogate ID', 'gRNA_x', 'mean_eff']]
-#     avg_indel_df.rename(columns={'gRNA_x': 'gRNA'}, inplace=True)
-#
-#
-#     pam_df = pd.read_excel('data/main_dataframes/Crispor.xlsx', sheet_name='TRAP12K microarray oligos')
-#     pam_df = pam_df[['Surrogate ID', 'sequences (5\'to3\')']]
-#     pam_df.rename(columns={'sequences (5\'to3\')': 'full_seq'}, inplace=True)
-#
-#
-#     new_df = pd.merge(avg_indel_df, pam_df, on='Surrogate ID', how="left")
-#
-#     new_df['gRNA'] = new_df.apply(lambda x: get_PAM(x), axis=1)
-#     new_df.drop('full_seq', axis='columns', inplace=True)
-#     new_df.to_csv('data/edited_dataframes/crispor_full.csv', index=False)
-#
-#     return new_df
-# def get_kim():
-#     def get_seq(row):
-#         seq = row['Target context sequence (4+20+3+3)'][4:25]
-#         return seq
-#
-#     if os.path.exists('data/edited_dataframes/kim_full.csv'):
-#         kim_df = pd.read_csv('data/edited_dataframes/kim_full.csv')
-#         return kim_df
-#
-#     kim_train_df = pd.read_excel('data/main_dataframes/kim.xlsx', sheet_name='HT_Cas9_Train')
-#     kim_test_df = pd.read_excel('data/main_dataframes/kim.xlsx', sheet_name='HT_Cas9_Test')
-#
-#     kim_train_df['gRNA'] = kim_train_df.apply(lambda x: get_seq(x), axis=1)
-#     kim_train_df = kim_train_df[['gRNA', 'Background subtracted indel (%)']]
-#     kim_train_df.rename(columns={'Background subtracted indel (%)': 'mean_eff'}, inplace=True)
-#
-#
-#     kim_test_df['gRNA'] = kim_test_df.apply(lambda x: get_seq(x), axis=1)
-#     kim_test_df = kim_test_df[['gRNA', 'Background subtracted indel frequencies\n(average, %)']]
-#     kim_test_df.rename(columns={'Background subtracted indel frequencies\n(average, %)': 'mean_eff'}, inplace=True)
-#
-#     kim_df = pd.concat([kim_train_df, kim_test_df])
-#     kim_df.to_csv('data/edited_dataframes/kim_full.csv', index=False)
-#     return kim_df
-# def linear_reg(crispor_df, kim_df):
-#     # Find the identical gRNAs in both df
-#     merged_df = pd.merge(crispor_df, kim_df, on='gRNA', how="inner")
-#     merged_df.rename(columns={'mean_eff_x': 'crispron_eff', 'mean_eff_y': 'kim_eff'}, inplace=True)
-#
-#     # Train linear regresiion from kim to crispron
-#     X_train = merged_df.kim_eff
-#     y_train = merged_df.crispron_eff
-#
-#     LR = LinearRegression()
-#     LR.fit(X_train.values.reshape(-1,1), y_train.values)
-#
-#     # Transform the full kim data
-#     predictions = LR.predict(kim_df.mean_eff.values.reshape(-1,1))
-#     kim_df['mean_eff_scaled'] = predictions
-#
-#     # Concantenate both dataframes
-#     concat_df = pd.concat([crispor_df, kim_df])
-#     return concat_df
-# def get_data():
-#     crispor_df = get_crispor()
-#     kim_df = get_kim()
-#
-#     concat_df = linear_reg(crispor_df, kim_df)
-#     return concat_df
-# def get_model():
-#     a=0
 
-
-
-# full_df = get_data()
-# model = get_model()
 
 def prepare_inputs(config):
     dir_path = f'data/tl_train/{config.tl_data_category}/{config.tl_data}/'
@@ -143,7 +41,7 @@ def prepare_u6_t7_files(config, dir_path):
     if not os.path.exists(main_dataframes_path):
         os.makedirs(main_dataframes_path)
 
-        main_file = open('data/main_dataframes/U6T7.tsv')
+        main_file = open('data/main_dataframes/target.tsv')
 
         headers = main_file.readline()
         names = []

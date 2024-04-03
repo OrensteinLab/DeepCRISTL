@@ -16,7 +16,8 @@ def generate_heatmap(config, from_pickle=False):
 
 
 
-    models = utils.get_all_models()
+    models = utils.get_all_models() 
+    #models = []
     models.sort()
     datasets = utils.get_all_datasets()
     datasets.sort()

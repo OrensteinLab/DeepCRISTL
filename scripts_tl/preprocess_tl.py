@@ -57,7 +57,7 @@ def prepare_u6_t7_files(config, dir_path):
     if not os.path.exists(main_dataframes_path):
         os.makedirs(main_dataframes_path)
 
-        main_file = open('data/main_dataframes/13059_2016_1012_MOESM14_ESM.tsv')
+        main_file = open('data/main_dataframes/target.tsv')
 
         headers = main_file.readline()
         names = []

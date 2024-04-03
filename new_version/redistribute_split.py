@@ -286,6 +286,17 @@ def redistribute_tl_data(df, seed):
 
 
 
+def redistribute_dhf_pretrain_data(df, seed):
+    hamming_matrix = calculate_hamming_distance_matix(df)
+    neighborehood_matrix = apply_neighbor_filter(hamming_matrix, max_distance=MAX_DISTANCE)
+    sets = get_sets(neighborehood_matrix)
+    train, test = train_test_split(df, sets, test_ratio=0.15)
+    train, val = train_val_split(train, val_ratio=0.1)
+
+    return train, val, test
+
+
+
 def main():
     # check args length
     if len(sys.argv)==2 and sys.argv[1] == 'remove_tl_leakage':
