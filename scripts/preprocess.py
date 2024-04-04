@@ -243,6 +243,17 @@ class MultiSeq(object):
     def add_seq(self, enzyme, seq, biofeat, y, conf=None):
         self.enzymes_seq[enzyme].add_seq(seq, biofeat, y, conf)
 
+    @staticmethod
+    def combine_multi_seqs(multiseq1, multiseq2):
+        combined_multiseq = MultiSeq()
+        for enzyme in combined_multiseq.enzymes_seq:
+            combined_multiseq.enzymes_seq[enzyme].combine_seqs(multiseq1.enzymes_seq[enzyme])
+            combined_multiseq.enzymes_seq[enzyme].combine_seqs(multiseq2.enzymes_seq[enzyme])
+        return combined_multiseq
+
+
+            
+
 
 class Seq(object):
     # This class is the serialized data for one enzyme only
@@ -271,6 +282,14 @@ class Seq(object):
 
         if conf is not None:
             self.confidence = np.append(self.confidence, np.array([conf], dtype=np.uint16), axis=0)
+
+
+    def combine_seqs(self, other_seq):
+        self.X = np.concatenate((self.X, other_seq.X), axis=0)
+        self.X_biofeat = np.concatenate((self.X_biofeat, other_seq.X_biofeat), axis=0)
+        self.y = np.append(self.y, other_seq.y, axis=0)
+        self.confidence = np.append(self.confidence, other_seq.confidence, axis=0)
+
 
 
     # def get_data(self):

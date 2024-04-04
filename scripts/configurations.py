@@ -49,7 +49,7 @@ def get_parser():
     parser.add_argument('-no_bio', '--no_biofeatures', dest='has_biofeatures', action='store_false')
     parser.add_argument('-mt', '--model_type', type=str, default='lstm')
     parser.add_argument('--weighted_loss', dest='weighted_loss', action='store_true')  # weighted_loss / row_reads model
-    parser.add_argument('--model_name', type=str, default='model_2')
+    parser.add_argument('--model_name', type=str, default='model_1') #TODO was 2???
 
 
     # GL model
