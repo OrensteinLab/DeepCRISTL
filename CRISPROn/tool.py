@@ -27,7 +27,7 @@ if __name__ == '__main__':
         from scripts_tool import cross_validation_tl as cv_tl
 
         if config.new_data_path == 'ALL_ORIGINAL_DATA':
-            data_paths = ['leenay','chari2015Train293T','doench2014-Hs','doench2014-Mm','doench2016_hg19','hart2016-Hct1162lib1Avg','hart2016-HelaLib1Avg','hart2016-HelaLib2Avg','hart2016-Rpe1Avg','morenoMateos2015','xu2015TrainHl60','xu2015TrainKbm7']
+            data_paths = ['leenay','chari2015Train293T','doench2014-Hs','doench2014-Mm','doench2016_hg19', 'doench2016plx_hg19','hart2016-Hct1162lib1Avg','hart2016-HelaLib1Avg','hart2016-HelaLib2Avg','hart2016-Rpe1Avg','morenoMateos2015','xu2015TrainHl60','xu2015TrainKbm7']
         else:
             data_paths = [config.new_data_path]
         for data_path in data_paths:
