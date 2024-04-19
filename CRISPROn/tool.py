@@ -159,8 +159,10 @@ if __name__ == '__main__':
                 del tape
 
                 # average the gradients for each sequence
-                gradients_x = np.mean(gradients_x, axis=0)
-                gradients_dg = np.mean(gradients_dg)
+                gradients_x = np.sum(gradients_x, axis=0) # TODO: make sure same results
+                gradients_dg = np.sum(gradients_dg)
+
+                 
 
                 saliency_map = gradients_x 
                 

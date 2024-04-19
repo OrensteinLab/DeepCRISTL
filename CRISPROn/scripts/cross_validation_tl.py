@@ -73,7 +73,7 @@ def cross_v_HPS(config, DataHandler):
         keras.backend.clear_session()
         DataHandler = load_fold_data(config, DataHandler, k)
         config.model_num = k+1 #np.random.randint(6) + 1
-        if config.train_type in ['full_tl', 'LL_tl', 'gl_tl', 'no_em_tl', 'no_tl', 'no_pre_train']:
+        if config.train_type in ['full_tl', 'LL_tl', 'gl_tl', 'no_conv_tl', 'no_tl', 'no_pre_train']:
             if config.train_type == 'gl_tl':
                 config.init_lr = gl_init_lr
 

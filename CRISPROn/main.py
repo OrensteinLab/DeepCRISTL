@@ -37,7 +37,7 @@ if __name__ == '__main__':
             config.tl_data = dataset
             print(f'Running full simulation for {config.tl_data} dataset')
 
-            train_types = ['full_tl', 'LL_tl', 'gl_tl', 'no_tl', 'no_pre_train']
+            train_types = ['full_tl', 'LL_tl', 'gl_tl', 'no_tl', 'no_pre_train', 'no_conv_tl']
             for set in range(5):
                 print(f'Running on set {set}')
                 config.set = set

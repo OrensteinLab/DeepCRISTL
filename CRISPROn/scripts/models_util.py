@@ -131,8 +131,17 @@ def load_pre_train_model(config, DataHandler, verbose=1):
     if config.train_type == 'gl_tl':
         for layer in model.layers[2:]:
             layer.trainable = True
-    if config.train_type == 'no_em_tl':
-        model.layers[1].trainable = False
+    if config.train_type == 'no_conv_tl':
+        for layer in model.layers:
+            # if layer is a conv layer
+            if 'conv' in layer.name:
+                layer.trainable = False
+
+                # for debug 
+                #print ("Made layer not trainable: ", layer.name)
+    
+
+    
 
     model.compile(loss='mse', optimizer=config.optimizer(lr=config.init_lr))
     if config.train_type != 'no_pre_train':

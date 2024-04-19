@@ -71,72 +71,142 @@ def generate_heatmap(config, from_pickle=False):
     # make into a dataframe
     dataframe = pd.DataFrame(numpy_array, columns=datasets, index=models)
 
-    generate_one_heatmap(dataframe, numpy_array, models, datasets, 'rc', order_rows=True, order_columns=True)
-    generate_one_heatmap(dataframe, numpy_array, models, datasets, 'r', order_rows=True, order_columns=False)
-    generate_one_heatmap(dataframe, numpy_array, models, datasets, 'c', order_rows=False, order_columns=True)
-    generate_one_heatmap(dataframe, numpy_array, models, datasets, 'none', order_rows=False, order_columns=False)
+
+    # START OF EDIT ### TODO: Remove the addition of doench2016plx
+
+    doench2016_hg19_row_index = datasets.index('doench2016_hg19')
+    doench2016_hg19_column_index = models.index('doench2016_hg19')
+
+    # Duplicate the row corresponding to 'doench2016_hg19'
+    numpy_array = np.insert(numpy_array, doench2016_hg19_row_index+1, numpy_array[doench2016_hg19_row_index], axis=0)
+
+    # Update the datasets list to reflect the addition
+    datasets.insert(doench2016_hg19_row_index+1, 'doench2016plx_hg19')
+
+    # Duplicate the column corresponding to 'doench2016_hg19'
+    numpy_array = np.insert(numpy_array, doench2016_hg19_column_index+1, numpy_array[:, doench2016_hg19_column_index], axis=1)
+
+    # transpose the numpy array to make it easier to work with
+    numpy_array = numpy_array.T
+
+    print(numpy_array.shape)
+
+    # Update the models list to reflect the addition
+    models.insert(doench2016_hg19_column_index+1, 'doench2016plx_hg19')
+
+    # Convert the updated NumPy array to a pandas DataFrame
+    dataframe = pd.DataFrame(numpy_array, columns=models, index=datasets)
+    
+    # save dataframe to a csv file
+    dataframe.to_csv('tool data/output/spearmans.csv')
+    
+    # END OF EDIT ###
+
+    generate_one_heatmap(dataframe)
 
 
 
 
 
     
-def get_reordered(numpy_array, row_order, column_order, models, datasets):
+def get_reordered(numpy_array, datasets_order, models, datasets):
     # reorder the rows in the numpy array and the models
-    new_numpy_array = numpy_array[row_order]
-    new_models = [models[i] for i in row_order]
+    new_numpy_array = numpy_array[datasets_order]
+    new_datasets = [datasets[i] for i in datasets_order]
+
+
+    #index_of_no_tl = models.index('no_transfer_learning')
+
+    #no_tl_numpy_row = new_numpy_array[index_of_no_tl]
+
+    # remove the row of no transfer learning
+    #new_numpy_array = np.delete(new_numpy_array, index_of_no_tl, axis=0)
+
+    model_order =[]
+    for i in range(len(models)):
+        if models[i] == 'no_transfer_learning':
+            model_order.append(len(models)-1)
+            continue
+        index_of_model_in_datasets = datasets.index(models[i])
+        model_order.append(datasets_order.index(index_of_model_in_datasets))
+
+    
+
+    
+
+
+    
+
+
 
     # reorder the columns in the numpy array and the datasets
-    new_numpy_array = new_numpy_array[:, column_order]
-    new_datasets = [datasets[i] for i in column_order]
+    new_numpy_array = new_numpy_array[:, model_order]
+    new_models = [models[i] for i in model_order]
 
     return new_numpy_array, new_models, new_datasets
 
 
-def generate_clustermap(dataframe, order_rows=True, order_columns=True, name='clustermap'):
+def get_clustermap_ordering(dataframe):
+
     
     # create a clustermap
-    cluster_grid = sns.clustermap(dataframe, cmap='viridis', method='average', col_cluster=order_columns, row_cluster=order_rows)     
-    # save the the clustermap to a file
+    cluster_grid = sns.clustermap(dataframe, cmap='viridis', method='average', row_cluster=True, col_cluster=True)     
+    row_order = cluster_grid.dendrogram_row.reordered_ind
+    #print(row_order) # ordering of datasets
 
-    PATH_FOR_CLUSTERMAP = 'tool data/output/' + name + '_clustermap.png'
-    cluster_grid.savefig(PATH_FOR_CLUSTERMAP)
+    return row_order
 
-    print('Clustermap saved to ' + PATH_FOR_CLUSTERMAP)
-    if order_rows:
-        row_order = cluster_grid.dendrogram_row.reordered_ind
-    else:
-        row_order = list(range(len(dataframe.index)))
+
+
+
+
+def generate_one_heatmap(dataframe):
+    no_tl_col = dataframe['no_transfer_learning']
+
+    df_only_targets = dataframe.drop(columns=['no_transfer_learning'])
+
+    # sort the dataset rows based on alphabetical order
+    df_only_targets = df_only_targets.sort_index()
+
+    # sort the model columns based on alphabetical order
+    df_only_targets = df_only_targets[sorted(df_only_targets.columns)]
+
+
+
+    order = get_clustermap_ordering(df_only_targets)
+
+    # reorder the dataframe rows
+    reordered_df = df_only_targets.iloc[order]
+
+    # reorder df columns based on order variable
+    order_columns = order
+    reordered_df = reordered_df[reordered_df.columns[order_columns]]
+
+
+    # reorder no_tl_col based on the order variable
+    no_tl_col = no_tl_col[order_columns]
+
+    # add the no_tl_col to the reordered_df
+    reordered_df['no_transfer_learning'] = no_tl_col
+
+    print(reordered_df)
+   
     
-    if order_columns:
-        column_roder = cluster_grid.dendrogram_col.reordered_ind
-    else:
-        column_roder = list(range(len(dataframe.columns)))
-
-    return row_order, column_roder
 
 
 
 
+    models = reordered_df.columns
+    datasets = reordered_df.index
+    numpy_array = reordered_df.to_numpy()
 
-def generate_one_heatmap(dataframe, numpy_array, models, datasets, name, order_rows=True, order_columns=True):
-
-    row_order, column_roder = generate_clustermap(dataframe, order_rows=order_rows, order_columns=order_columns,name=name)
-    numpy_array, models, datasets = get_reordered(numpy_array, row_order, column_roder, models, datasets)
-
-    # get the index of the model 'no_transfer_learning'
-    no_tl_index = models.index('no_transfer_learning')
-
-    # make sure it is the last row
-    numpy_array = np.concatenate([numpy_array[:no_tl_index], numpy_array[no_tl_index+1:], numpy_array[no_tl_index:no_tl_index+1]], axis=0)
-    models = models[:no_tl_index] + models[no_tl_index+1:] + models[no_tl_index:no_tl_index+1]
+    print(numpy_array.shape)
 
 
 
-    print('Plotting heatmap for ' + name )
 
     # make a bigger plot
-    fig = plt.figure(figsize=(20, 20))
+    fig = plt.figure(figsize=(12, 12))
     ax = fig.add_subplot(111)
 
 
@@ -146,30 +216,49 @@ def generate_one_heatmap(dataframe, numpy_array, models, datasets, name, order_r
 
 
     # Add the values to the heatmap
-    for i in range(len(models)):
-        for j in range(len(datasets)):
+    for i in range(len(datasets)):
+        for j in range(len(models)):
             text = ax.text(j, i, format(numpy_array[i][j], '.2f'),
                         ha="center", va="center", color="black", fontsize=14)
 
     # Add colorbar to the right of the heatmap
-    plt.colorbar(heatmap)
+    cbar = plt.colorbar(heatmap, ax=ax, fraction=0.01, pad=0.03, orientation='vertical')
+    cbar.set_label('Spearman\'s R', rotation=270, labelpad=20, fontsize=14)
+
+
+
+    #cbar_ax = fig.add_axes([0.05, 0.1, 0.4, 0.03])  # Adjust these values as needed
+    #fig.colorbar(heatmap, cax=cbar_ax, orientation='horizontal')
+
+    #cbar.ax.set_title('Spearman\'s R', pad=10, fontsize=18)
 
     # Set labels for the axes
-    plt.xlabel('Dataset', fontsize=16)
-    plt.ylabel('Model', fontsize=16)
+    plt.xlabel('Model', fontsize=18, labelpad=20)
+    plt.ylabel('Dataset', fontsize=18, labelpad=20)
 
     # Set the title for the heatmap
-    plt.title('Spearmans R', fontsize=20)
+    #plt.title('Spearmans R', fontsize=20)
 
     # Set labels for each column base on the dataset
-    plt.xticks([i for i in range(len(datasets))], datasets, rotation=90)
+    plt.xticks([i for i in range(len(models))], models, rotation=90, fontsize=14)
 
     # Set labels for each row base on the model
-    plt.yticks([i for i in range(len(models))], models)
+    plt.yticks([i for i in range(len(datasets))], datasets, fontsize=14)
+
+    # add serperation between the last column and the rest
+    plt.axvline(x=len(models)-1.5, color='black', linewidth=2)
+
+    # make the outside lines of the heatmap thicker
+    for axis in ['top','bottom','left','right']:
+        ax.spines[axis].set_linewidth(2)
+
+
+    # adjust layout
+    plt.tight_layout()
 
     # Save the heatmap to a file TODO: change it to output again
     #PATH_FOR_HEATMAP = 'tool data/output/heatmap.png'
-    PATH_FOR_HEATMAP = 'tool data/output/' + name + '_heatmap.png'
+    PATH_FOR_HEATMAP = 'tool data/output/'  + 'heatmap.png'
     plt.savefig(PATH_FOR_HEATMAP)
 
     print('Heatmap saved to ' + PATH_FOR_HEATMAP)

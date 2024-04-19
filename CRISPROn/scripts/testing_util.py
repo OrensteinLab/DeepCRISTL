@@ -1,6 +1,7 @@
 from scipy import stats
 import pandas as pd
 import os
+import numpy as np
 
 def test_model(config, model, DataHandler, verbose=1):
     spearman_result = {}
@@ -21,11 +22,17 @@ def test_model(config, model, DataHandler, verbose=1):
 
 
 def save_results(config, set, train_type, mean, spearmanr):
+    columns = ['full_tl', 'full_tl_ensemble', 'LL_tl', 'LL_tl_ensemble', 'gl_tl', 'gl_tl_ensemble', 'no_tl', 'no_tl_ensemble', 'no_pre_train', 'no_pre_train_ensemble', 'no_conv_tl', 'no_conv_tl_ensemble']
     results_path = f'results/transfer_learning/{config.tl_data}/results.csv'
     if os.path.exists(results_path):
         results_df = pd.read_csv(results_path, index_col=0)
+        # add columns if they don't exist TODO: remove this
+        for column in columns:
+            if column not in results_df.columns:
+                results_df[column] = [np.nan] * len(results_df)
+
+
     else:
-        columns = ['full_tl', 'full_tl_ensemble', 'LL_tl', 'LL_tl_ensemble', 'gl_tl', 'gl_tl_ensemble', 'no_tl', 'no_tl_ensemble', 'no_pre_train', 'no_pre_train_ensemble']
         rows = []
         for i in range(5):
             rows.append(f'set{i}')

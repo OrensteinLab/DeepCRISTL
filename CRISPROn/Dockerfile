@@ -21,11 +21,12 @@ RUN pip install \
 
 
 # Copy the current directory contents into the container at /app
-COPY . /app
+#COPY . /app
 
 # Define environment variable
 ENV NAME World
 
 
 # Run script.py when the container launches
-ENTRYPOINT  ["python", "tool.py"]
+#ENTRYPOINT  ["python", "tool.py"]
+CMD ["python", "tool.py", "--action", "heat_map"]
