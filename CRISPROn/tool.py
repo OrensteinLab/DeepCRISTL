@@ -69,7 +69,7 @@ if __name__ == '__main__':
     
 
 
-    if config.action == 'prediction':  #TODO: maybe add no transfer learning to the list of models
+    if config.action == 'prediction':
         from scripts_tool import models_util
         from scripts_tool import preprocess
         from scripts_tool import prediction
@@ -108,7 +108,9 @@ if __name__ == '__main__':
         
 
       
-
+    if config.action == 'preprocess_pretrain_data':
+        from scripts_tool import preprocess
+        preprocess.prepare_pretrain_data(config)
 
         
 
@@ -117,8 +119,8 @@ if __name__ == '__main__':
 
 
         from scripts_tool import models_util
-        #models = utils.get_all_models() + ['no transfer learning']
-        models = utils.get_all_models()
+        models = utils.get_all_models() + ['no transfer learning']
+        #models = utils.get_all_models()
         datasets = utils.get_all_datasets()
 
         for model in models:
@@ -183,7 +185,9 @@ if __name__ == '__main__':
             # average the saliency maps
             saliency_df = pd.concat(saliency_dfs).groupby(level=0).mean()
                 
-
+            # make all values to 0 in the PAM's GG region
+            saliency_df.loc[25] = 0
+            saliency_df.loc[26] = 0
 
             import logomaker 
             # Create the logo

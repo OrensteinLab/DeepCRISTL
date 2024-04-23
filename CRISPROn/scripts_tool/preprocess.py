@@ -10,6 +10,18 @@ import CRISPRspec_CRISPRoff_pipeline as pipe
 import pickle
 
 
+def prepare_pretrain_data(config):
+    config.new_data_path = 'pretrain'
+    prepare_inputs(config)
+
+
+
+
+
+
+
+
+
 def prepare_inputs(config):
     if check_files_already_prepared(config):
         print('Files are allready prepared')

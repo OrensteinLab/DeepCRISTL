@@ -7,7 +7,7 @@ def get_parser():
                          type=str,
                            default=None,
                            help= 'the simulation to perform.\n new_data requires new_data_path\n prediction requires input_file and model_to_use\n',
-                           choices=['new_data', 'list', 'prediction', 'heat_map', 'saliency_maps'])
+                           choices=['new_data', 'list', 'prediction', 'heat_map', 'saliency_maps', 'preprocess_pretrain_data'])
 
     parser.add_argument('--new_data_path',
                          type=str,

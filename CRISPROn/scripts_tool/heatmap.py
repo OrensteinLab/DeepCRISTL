@@ -68,31 +68,31 @@ def generate_heatmap(config, from_pickle=False):
     # make into a numpy array
     numpy_array = np.array(numpy_array)
 
-    # make into a dataframe
-    dataframe = pd.DataFrame(numpy_array, columns=datasets, index=models)
+    # # make into a dataframe
+    # dataframe = pd.DataFrame(numpy_array, columns=datasets, index=models)
 
 
     # START OF EDIT ### TODO: Remove the addition of doench2016plx
 
-    doench2016_hg19_row_index = datasets.index('doench2016_hg19')
-    doench2016_hg19_column_index = models.index('doench2016_hg19')
+    # doench2016_hg19_row_index = datasets.index('doench2016_hg19')
+    # doench2016_hg19_column_index = models.index('doench2016_hg19')
 
-    # Duplicate the row corresponding to 'doench2016_hg19'
-    numpy_array = np.insert(numpy_array, doench2016_hg19_row_index+1, numpy_array[doench2016_hg19_row_index], axis=0)
+    # # Duplicate the row corresponding to 'doench2016_hg19'
+    # numpy_array = np.insert(numpy_array, doench2016_hg19_row_index+1, numpy_array[doench2016_hg19_row_index], axis=0)
 
-    # Update the datasets list to reflect the addition
-    datasets.insert(doench2016_hg19_row_index+1, 'doench2016plx_hg19')
+    # # Update the datasets list to reflect the addition
+    # datasets.insert(doench2016_hg19_row_index+1, 'doench2016plx_hg19')
 
-    # Duplicate the column corresponding to 'doench2016_hg19'
-    numpy_array = np.insert(numpy_array, doench2016_hg19_column_index+1, numpy_array[:, doench2016_hg19_column_index], axis=1)
+    # # Duplicate the column corresponding to 'doench2016_hg19'
+    # numpy_array = np.insert(numpy_array, doench2016_hg19_column_index+1, numpy_array[:, doench2016_hg19_column_index], axis=1)
 
     # transpose the numpy array to make it easier to work with
     numpy_array = numpy_array.T
 
-    print(numpy_array.shape)
+    # print(numpy_array.shape)
 
-    # Update the models list to reflect the addition
-    models.insert(doench2016_hg19_column_index+1, 'doench2016plx_hg19')
+    # # Update the models list to reflect the addition
+    # models.insert(doench2016_hg19_column_index+1, 'doench2016plx_hg19')
 
     # Convert the updated NumPy array to a pandas DataFrame
     dataframe = pd.DataFrame(numpy_array, columns=models, index=datasets)

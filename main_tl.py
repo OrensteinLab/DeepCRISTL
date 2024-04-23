@@ -85,6 +85,11 @@ if __name__ == '__main__':
         DataHandler = dh_tl.get_data(config)
         cv_tl.data_size_scan(config, DataHandler)
 
+    if config.simulation_type == 'plot_loss_graph':
+        config.set = 0
+        config.save_model = False
+        training_util_tl.plot_loss_graph(config)
+
 
     if config.simulation_type == 'full_sim':
         if config.tl_data == 'ALL_ORIGINAL_DATA':

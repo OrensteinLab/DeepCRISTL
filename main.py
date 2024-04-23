@@ -81,6 +81,10 @@ if __name__ == '__main__':
     if config.simulation_type == 'postprocess':
         postprocess.postprocess(config)
 
+    if config.simulation_type == 'plot_loss_graph':
+        config.save_model = False
+        training_util.plot_loss_graph(config)
+
     if config.simulation_type == 'test':
         DataHandler = dh.get_data(config)
         model_path = f'models/pre_train/{config.pre_train_data}/{config.enzyme}/'

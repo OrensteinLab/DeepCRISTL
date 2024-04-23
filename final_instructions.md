@@ -7,7 +7,7 @@ python main.py -s_type preprocessing
 python main_tl.py -s_type preprocess--tl_data ALL_ORIGINAL_DATA --tl_data_category U6T7 
 
 CRISPRon
-python main_tl.py -s_type preprocess --tl_data ALL_ORIGINAL_DATA --tl_data_category U6T7 
+python main.py -s_type preprocess --tl_data ALL_ORIGINAL_DATA --tl_data_category U6T7 
 
 
 # DeepHF cross-v

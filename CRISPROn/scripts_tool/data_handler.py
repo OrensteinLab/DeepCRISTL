@@ -31,7 +31,10 @@ def get_user_input_data(sequences):
 
 
 def get_data_from_dataset(dataset_name):
-    dir_path = f'tool data/datasets/{dataset_name}/'
+    if dataset_name == 'no transfer learning':
+        dir_path = f'tool data/datasets/pretrain/'
+    else:
+        dir_path = f'tool data/datasets/{dataset_name}/'
     with open(dir_path + 'train_val_seq.pkl', "rb") as fp:
         test_val_seq = pickle.load(fp)
 
