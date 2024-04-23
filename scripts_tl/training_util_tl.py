@@ -7,6 +7,9 @@ import scipy as sp
 from scripts import models_util
 from scripts import data_handler as dh
 from keras.callbacks import Callback
+from scripts_tl import data_handler_tl as dh_tl
+from scripts_tl import configurations_tl as cfg_tl
+from scripts_tl import cross_validation_tl as cv_tl
 
 
 
@@ -40,12 +43,17 @@ def train_model(config, DataHandler, model, callback_list, verbose=2):
 
 
 def plot_loss_graph(config):
+    config.tl_data = 'doench2016_hg19'
+    config.set = 0
+    config.save_model = False
+    config.train_type = 'gl_tl'
+    DataHandler = dh_tl.get_data(config, config.set)
+    opt_epochs = cv_tl.cross_v_HPS(config, DataHandler)
+    config.epochs = opt_epochs
     # get data
-    DataHandler = dh.get_data(config)
     train_input, y_train = [DataHandler['X_train'], DataHandler['X_biofeat_train']], DataHandler['y_train']
     valid_input, y_val = [DataHandler['X_valid'], DataHandler['X_biofeat_valid']], DataHandler['y_valid']
 
-    test_data = (test_input, y_test)
 
     model, callback_list = models_util.get_model(config, DataHandler)
 
