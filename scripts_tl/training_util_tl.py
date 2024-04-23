@@ -43,31 +43,35 @@ def train_model(config, DataHandler, model, callback_list, verbose=2):
 
 
 def plot_loss_graph(config):
-    config.tl_data = 'doench2016_hg19'
+    config.tl_data = 'morenoMateos2015'
     config.set = 0
     config.save_model = False
-    config.train_type = 'gl_tl'
-    DataHandler = dh_tl.get_data(config, config.set)
-    opt_epochs = cv_tl.cross_v_HPS(config, DataHandler)
-    config.epochs = opt_epochs
-    # get data
-    train_input, y_train = [DataHandler['X_train'], DataHandler['X_biofeat_train']], DataHandler['y_train']
-    valid_input, y_val = [DataHandler['X_valid'], DataHandler['X_biofeat_valid']], DataHandler['y_valid']
+    config.epochs = 1000
 
 
-    model, callback_list = models_util.get_model(config, DataHandler)
+    train_types = ['full_tl']
+    for train_type in train_types:
+        config.train_type = train_type
+        DataHandler = dh_tl.get_data(config, config.set)
+        opt_epochs = cv_tl.cross_v_HPS(config, DataHandler)
+        config.epochs = opt_epochs
+        # get data
+        train_input, y_train = [DataHandler['X_train'], DataHandler['X_biofeat_train']], DataHandler['y_train']
+        valid_input, y_val = [DataHandler['X_valid'], DataHandler['X_biofeat_valid']], DataHandler['y_valid']
 
-    history = model.fit(train_input,
-                        y_train,
-                        batch_size=config.batch_size,
-                        epochs=config.epochs,
-                        verbose=2,
-                        validation_data=(valid_input, y_val),
-                        shuffle=True,
-                        callbacks=callback_list,
-                        )
-    
-    print(history.history)
-    for key in history.history.keys():
-        # print key and value
-        print(key, history.history[key])
+
+        model, callback_list = models_util.get_model(config, DataHandler)
+
+        history = model.fit(train_input,
+                            y_train,
+                            batch_size=config.batch_size,
+                            epochs=config.epochs,
+                            verbose=2,
+                            validation_data=(valid_input, y_val),
+                            shuffle=True,
+                            callbacks=callback_list,
+                            )
+        
+        for key in history.history.keys():
+            # print key and value
+            print(key, history.history[key])
