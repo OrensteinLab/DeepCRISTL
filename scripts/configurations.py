@@ -62,7 +62,7 @@ def get_parser():
 
     config = parser.parse_args()
     # Sanity check
-    if config.enzyme is None and config.simulation_type != 'preprocess' and config.simulation_type != 'postprocess':
+    if config.enzyme is None and config.simulation_type != 'preprocess' and config.simulation_type != 'postprocess' and config.simulation_type != 'train_for_emsemble_size_graph':
         print('No data type received >>>> exiting')
         exit(1)
 

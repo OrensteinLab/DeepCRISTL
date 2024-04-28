@@ -50,8 +50,8 @@ def ensemble_vs_num_of_models(config):
     # TODO: change to whatever is needed
     #enzymes = ['wt']
     #enzymes = ['esp', 'hf']
-    enzymes = ['esp']
-    #enzymes = ['wt', 'esp', 'hf', 'multi_task']
+    #enzymes = ['esp']
+    enzymes = ['wt', 'esp', 'hf', 'multi_task']
 
     # enzymes = ['multi_task']
 

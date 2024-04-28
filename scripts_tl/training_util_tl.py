@@ -52,6 +52,7 @@ def plot_loss_graph(config):
     train_types = ['full_tl']
     for train_type in train_types:
         config.train_type = train_type
+        config.enzyme = 'multi_task'
         DataHandler = dh_tl.get_data(config, config.set)
         opt_epochs = cv_tl.cross_v_HPS(config, DataHandler)
         config.epochs = opt_epochs
@@ -60,7 +61,7 @@ def plot_loss_graph(config):
         valid_input, y_val = [DataHandler['X_valid'], DataHandler['X_biofeat_valid']], DataHandler['y_valid']
 
 
-        model, callback_list = models_util.get_model(config, DataHandler)
+        model, callback_list = models_util.load_pre_train_model(config, DataHandler)
 
         history = model.fit(train_input,
                             y_train,

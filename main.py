@@ -50,6 +50,21 @@ if __name__ == '__main__':
     if config.simulation_type == 'preprocess':
         preprocess.prepare_inputs(config)
 
+
+    if config.simulation_type == 'train_for_emsemble_size_graph':
+        enzymes = ['wt', 'esp', 'hf', 'multi_task']
+        MODEL_COUNT = 20
+        for enzyme in enzymes:
+            for i in range(MODEL_COUNT):
+                print(f'Training model {i} for enzyme {enzyme} for ensemble size graph')
+                config.enzyme = enzyme
+                config = cfg.get_optimized_params(config)
+                config.save_model = True
+                DataHandler = dh.get_data(config)
+                model, callback_list = models_util.get_model(config, DataHandler)
+                history = training_util.train_model(config, DataHandler, model, callback_list)
+                testing_util.test_model(config, model, DataHandler['test'])
+
     if config.simulation_type == 'train':
         # Initializing random seed
         np.random.seed(1234)
