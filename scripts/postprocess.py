@@ -53,7 +53,6 @@ def ensemble_vs_num_of_models(config):
     #enzymes = ['esp']
     enzymes = ['wt', 'esp', 'hf', 'multi_task']
 
-    # enzymes = ['multi_task']
 
     if os.path.exists('results/pre_train/spearmans.pkl'):
         with open('results/pre_train/spearmans.pkl', "rb") as fp:
@@ -123,10 +122,14 @@ def test_means(config, DataHandler):
         for enzyme in enzymes:
 
             enz_predictions = np.array(predictions[enzyme])
+            #print(enz_predictions.shape)
             enz_predictions = np.squeeze(enz_predictions)
-            final_preds = np.zeros((test_prediction.shape[0], len(enz_predictions)))
+            #print(enz_predictions.shape)
+            final_preds = np.zeros((enz_predictions.shape[1], len(enz_predictions)))
+            #print(final_preds.shape)
             for i in range(len(enz_predictions)):
                 preds = enz_predictions[:i + 1]
+                #print(preds.shape)
                 if i == 0:
                     final_preds[:, i] = preds
                 else:
@@ -140,9 +143,9 @@ def test_means(config, DataHandler):
                 spearmans[enzyme].append(spearman)
     else:
         predictions = np.array(predictions)
-        print(predictions.shape)
+        #print(predictions.shape)
         predictions = np.squeeze(predictions, axis=2)
-        print(predictions.shape)
+        #print(predictions.shape)
         final_preds =  np.zeros((test_prediction.shape[0], len(predictions)))
         for i in range(len(predictions)):
             preds = predictions[:i+1]
@@ -154,7 +157,7 @@ def test_means(config, DataHandler):
         for i in range(final_preds.shape[1]):
             pred = final_preds[:, i]
             spearman = sp.stats.spearmanr(test_true_label, pred)[0]
-            print(spearman)
+            #print(spearman)
             spearmans.append(spearman)
 
     return spearmans
