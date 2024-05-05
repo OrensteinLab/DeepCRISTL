@@ -207,14 +207,14 @@ def plot_spearman_curve(spearmans):
 
 
     leg2 = plt.legend(enzyme_legend, enzymes, bbox_to_anchor=(0.65, 0.22))
-    #leg3 = plt.legend([enzyme_legend[0], sing_vs_multi_legend[0]], ['Single-task', 'Multi-task'],  bbox_to_anchor=(0.9, 0.22)) TODO: add this back when have multi task
+    leg3 = plt.legend([enzyme_legend[0], sing_vs_multi_legend[0]], ['Single-task', 'Multi-task'],  bbox_to_anchor=(0.92, 0.22)) #TODO: add this back when have multi task
     plt.gca().add_artist(leg2)
 
     # plt.legend(bbox_to_anchor=(0.3, 0.4))
     plt.ylabel('Spearman')
     plt.xlabel('Number of models')
     plt.xticks(np.arange(1, 21))
-    plt.title('Ensemble model spearman result Vs number of models')
+    #plt.title('Ensemble model spearman result Vs number of models')
     plt.savefig('results/pre_train/ensemble_vs_num_of_models.png')
 
 
