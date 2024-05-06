@@ -7,6 +7,7 @@ from scripts import testing_util
 from scripts import  hyper_parameter_search as hps
 from scripts import postprocess
 import keras
+import time
 
 #interperter = ModelInterpertation
 
@@ -38,6 +39,7 @@ if __name__ == '__main__':
             print(f'Running full simulation for {config.tl_data} dataset')
 
             train_types = ['full_tl', 'LL_tl', 'gl_tl', 'no_tl', 'no_pre_train', 'no_conv_tl']
+            train_times = {'full_tl': [], 'LL_tl': [], 'gl_tl': [], 'no_tl': [], 'no_pre_train': [], 'no_conv_tl': []}
             for set in range(5):
                 print(f'Running on set {set}')
                 config.set = set
@@ -45,6 +47,9 @@ if __name__ == '__main__':
 
 
                 for train_type in train_types:
+                    # start counting time
+                    starting_time = time.time()
+
                     print(f'#################### Running {train_type} model #############################')
                     config.train_type = train_type
                     config.save_model = False
@@ -62,11 +67,17 @@ if __name__ == '__main__':
                     config.save_model = True
                     mean = cv_tl.train_6(config, DataHandler)
 
+                    end_time = time.time()
+                    train_times[train_type].append(end_time - starting_time)
+
                     print(f'Running ensemble with {train_type} model')
                     spearmanr = ensemble_util.train_ensemble(config, DataHandler)
 
                     testing_util.save_results(config, set, train_type, mean, spearmanr)
                     keras.backend.clear_session()
+
+            for train_type in train_types:
+                print(f'Average time for {train_type} model: {sum(train_times[train_type]) / len(train_times[train_type])}, using {dataset} dataset')
 
             
         print('Full simulation done')

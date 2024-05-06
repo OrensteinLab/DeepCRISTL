@@ -112,7 +112,7 @@ def train_6(config, DataHandler):
 
         model, callback_list = models_util.load_pre_train_model(config, DataHandler)
 
-        history = training_util.train_model(config, DataHandler, model, callback_list)
+        history = training_util.train_model_no_val(config, DataHandler, model, callback_list) #TODO : check works
         spearman_result.append(testing_util.test_model(config, model, DataHandler))
 
     results_path = f'results/transfer_learning/{config.tl_data}/set{config.set}/'
