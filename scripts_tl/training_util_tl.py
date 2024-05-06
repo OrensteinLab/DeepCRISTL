@@ -10,6 +10,9 @@ from keras.callbacks import Callback
 from scripts_tl import data_handler_tl as dh_tl
 from scripts_tl import configurations_tl as cfg_tl
 from scripts_tl import cross_validation_tl as cv_tl
+from scripts import models_util
+import keras
+from scripts_tl import training_util_tl
 
 
 
@@ -37,6 +40,10 @@ def train_model(config, DataHandler, model, callback_list, verbose=2):
                         shuffle=True,
                         callbacks=callback_list,
                         )
+    
+    for key in history.history.keys():
+        print(key, history.history[key])
+
     return history
 
 
@@ -54,25 +61,8 @@ def plot_loss_graph(config):
         config.train_type = train_type
         config.enzyme = 'multi_task'
         DataHandler = dh_tl.get_data(config, config.set)
-        opt_epochs = cv_tl.cross_v_HPS(config, DataHandler)
-        config.epochs = opt_epochs
-        # get data
-        train_input, y_train = [DataHandler['X_train'], DataHandler['X_biofeat_train']], DataHandler['y_train']
-        valid_input, y_val = [DataHandler['X_valid'], DataHandler['X_biofeat_valid']], DataHandler['y_valid']
+        cv_tl.cross_v_HPS(config, DataHandler, n_folds=1)
 
 
-        model, callback_list = models_util.load_pre_train_model(config, DataHandler)
 
-        history = model.fit(train_input,
-                            y_train,
-                            batch_size=config.batch_size,
-                            epochs=config.epochs,
-                            verbose=2,
-                            validation_data=(valid_input, y_val),
-                            shuffle=True,
-                            callbacks=callback_list,
-                            )
         
-        for key in history.history.keys():
-            # print key and value
-            print(key, history.history[key])

@@ -93,7 +93,7 @@ def load_fold_data(config, DataHandler, k):
     return DataHandler
 
 
-def cross_v_HPS(config, DataHandler):
+def cross_v_HPS(config, DataHandler, n_folds=10):
     
     #print("TEST3")
     #print(DataHandler['X_biofeat_train'].shape)
@@ -101,7 +101,7 @@ def cross_v_HPS(config, DataHandler):
     create_data(config, DataHandler)
     best_epoch_arr = []
     # config.epochs = 100
-    for k in range(10):
+    for k in range(n_folds):
         print(f'\nStarting training {k}')
         keras.backend.clear_session()
         DataHandler = load_fold_data(config, DataHandler, k)
