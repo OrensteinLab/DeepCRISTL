@@ -28,6 +28,43 @@ if __name__ == '__main__':
             print(f'Running preprocess for {config.tl_data} dataset')
             preprocess.prepare_inputs(config)
 
+    if config.simulation_type == 'compare_sizes':
+        config.tl_data = 'morenoMateos2015'
+
+
+        print(f'Running full simulation for {config.tl_data} dataset')
+
+        train_types = [ 'LL_tl', 'gl_tl']
+        for set in range(5):
+            print(f'Running on set {set}')
+            config.set = set
+            DataHandler = dh.get_data(config, set)
+
+
+            for train_type in train_types:
+                # start counting time
+
+                print(f'#################### Running {train_type} model #############################')
+                config.train_type = train_type
+                config.save_model = False
+                print(f'Running cross_v_HPS with {train_type} model')
+                config.epochs = 100
+                opt_epochs = cv_tl.cross_v_HPS(config, DataHandler)
+                config.epochs = opt_epochs
+   
+                print(f'Running full_train with {train_type} model')
+                config.save_model = True
+                mean = cv_tl.train_6(config, DataHandler)
+
+
+                print(f'Running ensemble with {train_type} model')
+                spearmanr = ensemble_util.train_ensemble(config, DataHandler)
+
+                testing_util.save_results(config, set, train_type, mean, spearmanr)
+                keras.backend.clear_session()
+
+
+
     if config.simulation_type == 'full_sim':
         if config.tl_data == 'ALL_ORIGINAL_DATA':
             datasets = ['leenay', 'chari2015Train293T','doench2014-Hs','doench2014-Mm','doench2016_hg19', 'doench2016plx_hg19','hart2016-Hct1162lib1Avg','hart2016-HelaLib1Avg','hart2016-HelaLib2Avg','hart2016-Rpe1Avg','morenoMateos2015','xu2015TrainHl60','xu2015TrainKbm7']
