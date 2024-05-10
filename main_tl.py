@@ -60,10 +60,12 @@ if __name__ == '__main__':
         history = training_util_tl.train_model(config, DataHandler, model, callback_list)
         testing_util_tl.test_model(config, model, DataHandler)
 
+
     if config.simulation_type == 'param_search':
         config.save_model = False
         DataHandler = dh_tl.get_data(config)
         hps_tl.param_search(config, DataHandler)
+
 
     if config.simulation_type == 'train_full':
         config.save_model = False
@@ -71,19 +73,21 @@ if __name__ == '__main__':
         DataHandler = dh_tl.get_data(config, set=0)
         cv_tl.train_10(config, DataHandler)
 
+
     if config.simulation_type == 'cross_v_HPS':
         config.save_model = False
         DataHandler = dh_tl.get_data(config)
         cv_tl.cross_v_HPS(config, DataHandler)
 
+
     if config.simulation_type == 'ensemble':
         DataHandler = dh_tl.get_data(config)
         ensemble_util_tl.train_ensemble(config, DataHandler)
 
-    if config.simulation_type == 'data_size_scan':
-        config.save_model = False
-        DataHandler = dh_tl.get_data(config)
-        cv_tl.data_size_scan(config, DataHandler)
+    # if config.simulation_type == 'data_size_scan':
+    #     config.save_model = False
+    #     DataHandler = dh_tl.get_data(config)
+    #     cv_tl.data_size_scan(config, DataHandler)
 
     if config.simulation_type == 'plot_loss_graph':
         config.set = 0
