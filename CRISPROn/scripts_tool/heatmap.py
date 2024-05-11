@@ -233,8 +233,8 @@ def generate_one_heatmap(dataframe):
     #cbar.ax.set_title('Spearman\'s R', pad=10, fontsize=18)
 
     # Set labels for the axes
-    plt.xlabel('Model', fontsize=18, labelpad=20)
-    plt.ylabel('Dataset', fontsize=18, labelpad=20)
+    plt.xlabel('Model', fontsize=16, labelpad=20)
+    plt.ylabel('Dataset', fontsize=16, labelpad=20)
 
     # Set the title for the heatmap
     #plt.title('Spearmans R', fontsize=20)
@@ -258,8 +258,8 @@ def generate_one_heatmap(dataframe):
 
     # Save the heatmap to a file TODO: change it to output again
     #PATH_FOR_HEATMAP = 'tool data/output/heatmap.png'
-    PATH_FOR_HEATMAP = 'tool data/output/'  + 'heatmap.png'
-    plt.savefig(PATH_FOR_HEATMAP)
+    PATH_FOR_HEATMAP = 'tool data/output/'  + 'heatmap.svg'
+    plt.savefig(PATH_FOR_HEATMAP, dpi = 400)
 
     print('Heatmap saved to ' + PATH_FOR_HEATMAP)
 
