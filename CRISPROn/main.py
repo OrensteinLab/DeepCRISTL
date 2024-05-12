@@ -8,6 +8,7 @@ from scripts import  hyper_parameter_search as hps
 from scripts import postprocess
 import keras
 import time
+import numpy as np
 
 #interperter = ModelInterpertation
 
@@ -77,6 +78,7 @@ if __name__ == '__main__':
 
             train_types = ['full_tl', 'LL_tl', 'gl_tl', 'no_tl', 'no_pre_train', 'no_conv_tl']
             train_times = {'full_tl': [], 'LL_tl': [], 'gl_tl': [], 'no_tl': [], 'no_pre_train': [], 'no_conv_tl': []}
+            epochs_chosen = {'full_tl': [], 'LL_tl': [], 'gl_tl': [], 'no_tl': [], 'no_pre_train': [], 'no_conv_tl': []}
             for set in range(5):
                 print(f'Running on set {set}')
                 config.set = set
@@ -100,6 +102,8 @@ if __name__ == '__main__':
                         # config.epochs = 100
                         # hps.param_search(config, DataHandler)
 
+                    epochs_chosen[train_type].append(config.epochs)
+
                     print(f'Running full_train with {train_type} model')
                     config.save_model = True
                     mean = cv_tl.train_6(config, DataHandler)
@@ -114,7 +118,10 @@ if __name__ == '__main__':
                     keras.backend.clear_session()
 
             for train_type in train_types:
-                print(f'Average time for {train_type} model: {sum(train_times[train_type]) / len(train_times[train_type])}, using {dataset} dataset')
+                print(f'Average time for {train_type} model: {np.mean(train_times[train_type])}, using {dataset} dataset')
+                print(f'std time for {train_type} model: {np.std(train_times[train_type])}, using {dataset} dataset')
+                print(f'Average epochs chosen for {train_type} model: {np.mean(epochs_chosen[train_type])}, using {dataset} dataset')
+                print(f'std epochs chosen for {train_type} model: {np.std(epochs_chosen[train_type])}, using {dataset} dataset')
 
             
         print('Full simulation done')
