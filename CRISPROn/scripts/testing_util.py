@@ -14,6 +14,10 @@ def test_model(config, model, DataHandler, verbose=1):
     test_true_label = DataHandler['y_test']
     test_prediction = model.predict(test_input)
     spearman = stats.spearmanr(test_true_label, test_prediction)
+    # print 20 first predictions vs true labels
+    # for i in range(20):
+    #     print(f'Prediction: {test_prediction[i]} True label: {test_true_label[i]}')
+        
     spearman_result = spearman[0]
     if verbose > 0:
         print(f'Spearman: {spearman}')

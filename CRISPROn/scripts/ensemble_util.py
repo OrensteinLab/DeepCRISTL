@@ -4,7 +4,7 @@ import numpy as np
 import scipy as sp
 
 
-def load_all_models(config):
+def load_all_models(config, model_string=''):
     models_dir = f'tl_models/transfer_learning/{config.tl_data}/set{config.set}/{config.train_type}/'
 
     all_models = []
@@ -37,8 +37,12 @@ def test_means(config, all_models, DataHandler):
     print(f'Spearman: {spearmanr}')
     return spearmanr
 
-def train_ensemble(config, DataHandler):
+def train_ensemble(config, DataHandler, model_string=''):
     config.save_model = False
-    all_models = load_all_models(config)
+    all_models = load_all_models(config, model_string=model_string)
     spearmanr = test_means(config, all_models, DataHandler)
+    return spearmanr
+
+def test_ensemble(config, DataHandler, models):
+    spearmanr = test_means(config, models, DataHandler)
     return spearmanr

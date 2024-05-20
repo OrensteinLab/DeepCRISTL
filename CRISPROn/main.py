@@ -9,6 +9,7 @@ from scripts import postprocess
 import keras
 import time
 import numpy as np
+import os
 
 #interperter = ModelInterpertation
 
@@ -31,38 +32,70 @@ if __name__ == '__main__':
 
     if config.simulation_type == 'compare_sizes':
         config.tl_data = 'morenoMateos2015'
+        sizes = ['no_tl', 5000, 10000, 15000, 20000,'full']
+        for size in sizes:
 
 
-        print(f'Running full simulation for {config.tl_data} dataset')
-
-        train_types = [ 'LL_tl', 'gl_tl']
-        for set in range(5):
-            print(f'Running on set {set}')
-            config.set = set
-            DataHandler = dh.get_data(config, set)
-
-
-            for train_type in train_types:
-                # start counting time
-
-                print(f'#################### Running {train_type} model #############################')
-                config.train_type = train_type
-                config.save_model = False
-                print(f'Running cross_v_HPS with {train_type} model')
-                config.epochs = 100
-                opt_epochs = cv_tl.cross_v_HPS(config, DataHandler)
-                config.epochs = opt_epochs
-   
-                print(f'Running full_train with {train_type} model')
-                config.save_model = True
-                mean = cv_tl.train_6(config, DataHandler)
+            print(f'Running simulation for {config.tl_data} dataset on size {size}')
+            if size == 'no_tl':
+                train_types = ['no_tl']
+                model_string = ''
+            else:
+                train_types = [ 'LL_tl', 'gl_tl']
+                if size == 'full':
+                    model_string = ''
+                else:
+                    model_string = f'_{size}'
 
 
-                print(f'Running ensemble with {train_type} model')
-                spearmanr = ensemble_util.train_ensemble(config, DataHandler)
+            gl_spearmans = []
+            no_tl_spearmans = []
+            for set in range(5):
+                print(f'Running on set {set}')
+                config.set = set
+                DataHandler = dh.get_data(config, set)
+                
 
-                testing_util.save_results(config, set, train_type, mean, spearmanr)
-                keras.backend.clear_session()
+
+                for train_type in train_types:
+                    # start counting time
+
+                    print(f'#################### Running {train_type} model #############################')
+                    config.train_type = train_type
+                    config.save_model = False
+                    print(f'Running cross_v_HPS with {train_type} model')
+                    config.epochs = 100
+                    opt_epochs = cv_tl.cross_v_HPS(config, DataHandler, model_string=model_string)
+                    config.epochs = opt_epochs
+    
+                    print(f'Running full_train with {train_type} model')
+                    config.save_model = True
+                    mean, models = cv_tl.train_6(config, DataHandler, model_string=model_string, return_model=True)
+
+
+                    print(f'Running ensemble with {train_type} model')
+                    #spearmanr = ensemble_util.train_ensemble(config, DataHandler)
+                    spearmanr = ensemble_util.test_ensemble(config, DataHandler, models)
+
+                    if train_type == 'gl_tl':
+                        gl_spearmans.append(spearmanr[0])
+                    if train_type == 'no_tl':
+                        no_tl_spearmans.append(spearmanr[0])
+
+                    keras.backend.clear_session()
+            if size == 'no_tl':
+                print(f'Spearmans for no_tl on morenoMateos2015: {no_tl_spearmans}')
+            else:
+                print(f'Spearmans for gl_tl on morenoMateos2015 with size {size}: {gl_spearmans}')
+
+            # delete the created models
+            path = f'tl_models/transfer_learning/morenoMateos2015'
+            for root, dirs, files in os.walk(path):
+                for file in files:
+                    os.remove(os.path.join(root, file))
+                for dir in dirs:
+                    os.rmdir(os.path.join(root, dir))
+
 
 
 
@@ -96,11 +129,9 @@ if __name__ == '__main__':
                     if config.train_type == 'no_tl':
                         config.epochs = 0
                     else:
-                        config.epochs = 100
+                        config.epochs = 100 # TODO was 100
                         opt_epochs = cv_tl.cross_v_HPS(config, DataHandler)
                         config.epochs = opt_epochs
-                        # config.epochs = 100
-                        # hps.param_search(config, DataHandler)
 
                     epochs_chosen[train_type].append(config.epochs)
 
@@ -113,7 +144,6 @@ if __name__ == '__main__':
 
                     print(f'Running ensemble with {train_type} model')
                     spearmanr = ensemble_util.train_ensemble(config, DataHandler)
-
                     testing_util.save_results(config, set, train_type, mean, spearmanr)
                     keras.backend.clear_session()
 

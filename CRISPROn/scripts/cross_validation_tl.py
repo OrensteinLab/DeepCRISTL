@@ -7,7 +7,9 @@ from scripts import models_util
 from scripts import training_util
 from scripts import testing_util
 
-gl_init_lr = 0.0008
+#gl_init_lr = 0.00001 
+gl_init_lr = 0.0008 
+
 def create_data(config, DataHandler):
     # Create main dir
     data_dir = f'data/tl_train/{config.tl_data_category}/{config.tl_data}/set{config.set}/6_fold/'
@@ -65,7 +67,7 @@ def load_fold_data(config, DataHandler, k):
 
     return DataHandler
 
-def cross_v_HPS(config, DataHandler):
+def cross_v_HPS(config, DataHandler, model_string=''):
     create_data(config, DataHandler)
     best_epoch_arr = []
     for k in range(6):
@@ -77,7 +79,7 @@ def cross_v_HPS(config, DataHandler):
             if config.train_type == 'gl_tl':
                 config.init_lr = gl_init_lr
 
-            model, callback_list = models_util.load_pre_train_model(config, DataHandler)
+            model, callback_list = models_util.load_pre_train_model(config, DataHandler, model_string=model_string)
         # elif config.train_type == 'no_pre_train':
         #     model, callback_list = models_util.get_model(config, DataHandler)
         history = training_util.train_model(config, DataHandler, model, callback_list)
@@ -97,9 +99,10 @@ def cross_v_HPS(config, DataHandler):
     opt_epochs = round(np.mean(best_epoch_arr))
     return opt_epochs
 
-def train_6(config, DataHandler):
+def train_6(config, DataHandler, model_string='', return_model=False):
     spearman_result = []
-    DataHandler['X_train'] = np.concatenate((DataHandler['X_train'], DataHandler['X_valid']))
+    models =[]
+    DataHandler['X_train'] = np.concatenate((DataHandler['X_train'], DataHandler['X_valid'])) 
     DataHandler['dg_train'] = np.concatenate((DataHandler['dg_train'], DataHandler['dg_valid']))
     DataHandler['y_train'] = np.concatenate((DataHandler['y_train'], DataHandler['y_valid']))
 
@@ -110,9 +113,12 @@ def train_6(config, DataHandler):
         if config.train_type == 'gl_tl':
             config.init_lr = gl_init_lr
 
-        model, callback_list = models_util.load_pre_train_model(config, DataHandler)
-
-        history = training_util.train_model(config, DataHandler, model, callback_list, final_models=True) 
+        model, callback_list = models_util.load_pre_train_model(config, DataHandler, model_string='')
+        if return_model:
+            history, model = training_util.train_model(config, DataHandler, model, callback_list, final_models=True, return_model = return_model) 
+            models.append(model)
+        else:
+            history = training_util.train_model(config, DataHandler, model, callback_list, final_models=True) 
         spearman_result.append(testing_util.test_model(config, model, DataHandler))
 
     results_path = f'results/transfer_learning/{config.tl_data}/set{config.set}/'
@@ -124,4 +130,6 @@ def train_6(config, DataHandler):
     mean = sum(spearman_result) / len(spearman_result)
     f.write(f'spearmans - {spearman_result}, mean - {mean}\n')
     f.close()
+    if return_model:
+        return mean, models
     return mean

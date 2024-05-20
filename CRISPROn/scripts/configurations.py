@@ -17,11 +17,13 @@ def get_parser():
     parser.add_argument('-t_type', '--train_type', type=str, default=None)
 
     # Hyper parameters
-    parser.add_argument('--init_lr', type=float, default=0.0043)
-
+    #parser.add_argument('--init_lr', type=float, default=0.0001) 
+    parser.add_argument('--init_lr', type=float, default=0.0043) 
 
     config = parser.parse_args()
 
+    # config.optimizer = Adam
+    # config.batch_size = 500
     config.optimizer = RMSprop
     config.batch_size = 80
 
