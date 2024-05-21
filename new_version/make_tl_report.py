@@ -3,7 +3,7 @@ import numpy as np
 import os
 import matplotlib.pyplot as plt
 
-MODE = 'VARIOUS'
+MODE = 'CRISPRON'
 
 def main():
     # get all folders in the current directory
@@ -11,7 +11,7 @@ def main():
 
     results_of_all_folders = []
     for folder in folders:
-        if MODE == 'DEEPCRISTL':
+        if MODE == 'DEEPHF':
             subfolders = [f for f in os.listdir(folder) if os.path.isdir(os.path.join(folder, f))]
             dict = {}
             for subfolder in subfolders:

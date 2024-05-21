@@ -95,7 +95,7 @@ class GetBest(Callback):
 def load_tl_models(config):
     models = []
     for i in range(6):
-        model_path = f'tool data/models/{config.model_to_use}/gl_tl/model_{i}/model'
+        model_path = f'tool data/models/{config.model_to_use}/full_tl/model_{i}/model'
         model = tf.keras.models.load_model(model_path)
         models.append(model)
 

@@ -36,7 +36,7 @@ if __name__ == '__main__':
             preprocess.prepare_inputs(config)
 
             print(f'Training on {config.new_data_path} dataset')
-            train_types = ['LL_tl', 'gl_tl']
+            train_types = ['full_tl']
 
             DataHandler = dh.get_data(config)
 

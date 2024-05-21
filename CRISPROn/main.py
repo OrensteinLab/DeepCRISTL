@@ -41,14 +41,14 @@ if __name__ == '__main__':
                 train_types = ['no_tl']
                 model_string = ''
             else:
-                train_types = [ 'LL_tl', 'gl_tl']
+                train_types = ['full_tl']
                 if size == 'full':
                     model_string = ''
                 else:
                     model_string = f'_{size}'
 
 
-            gl_spearmans = []
+            full_spearmans = []
             no_tl_spearmans = []
             for set in range(5):
                 print(f'Running on set {set}')
@@ -64,12 +64,15 @@ if __name__ == '__main__':
                     config.train_type = train_type
                     config.save_model = False
                     print(f'Running cross_v_HPS with {train_type} model')
-                    config.epochs = 100
-                    opt_epochs = cv_tl.cross_v_HPS(config, DataHandler, model_string=model_string)
-                    config.epochs = opt_epochs
+                    if train_type not in ['no_tl']:
+                        config.epochs = 100
+                        opt_epochs = cv_tl.cross_v_HPS(config, DataHandler, model_string=model_string)
+                        config.epochs = opt_epochs
+                    else:
+                        config.epochs = 0
     
                     print(f'Running full_train with {train_type} model')
-                    config.save_model = True
+                    config.save_model = False
                     mean, models = cv_tl.train_6(config, DataHandler, model_string=model_string, return_model=True)
 
 
@@ -77,8 +80,8 @@ if __name__ == '__main__':
                     #spearmanr = ensemble_util.train_ensemble(config, DataHandler)
                     spearmanr = ensemble_util.test_ensemble(config, DataHandler, models)
 
-                    if train_type == 'gl_tl':
-                        gl_spearmans.append(spearmanr[0])
+                    if train_type == 'full_tl':
+                        full_spearmans.append(spearmanr[0])
                     if train_type == 'no_tl':
                         no_tl_spearmans.append(spearmanr[0])
 
@@ -86,7 +89,7 @@ if __name__ == '__main__':
             if size == 'no_tl':
                 print(f'Spearmans for no_tl on morenoMateos2015: {no_tl_spearmans}')
             else:
-                print(f'Spearmans for gl_tl on morenoMateos2015 with size {size}: {gl_spearmans}')
+                print(f'Spearmans for full_tl on morenoMateos2015 with size {size}: {full_spearmans}')
 
             # delete the created models
             path = f'tl_models/transfer_learning/morenoMateos2015'
