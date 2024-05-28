@@ -40,8 +40,9 @@ def create_data(config, DataHandler):
     X_biofeat = np.concatenate((DataHandler['X_biofeat_train'], DataHandler['X_biofeat_valid']))
     y = np.concatenate((DataHandler['y_train'], DataHandler['y_valid']))
 
-    if config.simulation_type == 'full_cross_v':
-        X, X_biofeat, y = concantenate_test_data(config, X, X_biofeat, y, DataHandler)
+    # If full cross validation, add test data -> Note: this is already done on the file level so this is redundant
+    # if config.simulation_type == 'full_cross_v':
+    #     X, X_biofeat, y = concantenate_test_data(config, X, X_biofeat, y, DataHandler)
 
     if weighted_loss:
         confidence = np.concatenate((DataHandler['conf_train'], DataHandler['conf_valid']))
@@ -126,6 +127,8 @@ def train_10_fold(config, DataHandler):
 
     if config.simulation_type == 'cross_v':
         results_path = 'results/transfer_learning/' if config.transfer_learning else 'results/pre_train/'
+        if not os.path.exists('results'):
+            os.mkdir('results')
         if not os.path.exists(results_path):
             os.mkdir(results_path)
         results_path += f'{config.pre_train_data}_{config.enzyme}_cross_v.txt'

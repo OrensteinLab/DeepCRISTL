@@ -7,13 +7,15 @@ from scripts import models_util
 from scripts import training_util
 from scripts import testing_util
 
-gl_init_lr = 0.0008
+#gl_init_lr = 0.00001 
+gl_init_lr = 0.0008 
+
 def create_data(config, DataHandler):
     # Create main dir
-    data_dir = f'data/tl_train/{config.tl_data_category}/{config.tl_data}/set{config.set}/10_fold/'
+    data_dir = f'data/tl_train/{config.tl_data_category}/{config.tl_data}/set{config.set}/6_fold/'
     if not os.path.exists(data_dir):
         os.makedirs(data_dir)
-    if os.path.exists(data_dir + '9_fold/'):
+    if os.path.exists(data_dir + '5_fold/'):
         print('Data allready created')
         return
 
@@ -24,9 +26,9 @@ def create_data(config, DataHandler):
 
 
     perm = np.random.permutation(X.shape[0])
-    val_size = int(X.shape[0] / 10)
+    val_size = int(X.shape[0] / 6)
 
-    for ind in range(10):
+    for ind in range(6):
         # Create fold dir
         fold_dir = data_dir + f'{ind}_fold/'
         os.mkdir(fold_dir)
@@ -52,7 +54,7 @@ def create_data(config, DataHandler):
         pickle.dump(y_train, open(fold_dir + f'y_train.pkl', "wb"))
 
 def load_fold_data(config, DataHandler, k):
-    data_dir =  f'data/tl_train/{config.tl_data_category}/{config.tl_data}/set{config.set}/10_fold/'
+    data_dir =  f'data/tl_train/{config.tl_data_category}/{config.tl_data}/set{config.set}/6_fold/'
     data_dir += f'{k}_fold/'
 
 
@@ -65,19 +67,19 @@ def load_fold_data(config, DataHandler, k):
 
     return DataHandler
 
-def cross_v_HPS(config, DataHandler):
+def cross_v_HPS(config, DataHandler, model_string=''):
     create_data(config, DataHandler)
     best_epoch_arr = []
-    for k in range(10):
+    for k in range(6):
         print(f'\nStarting training {k}')
         keras.backend.clear_session()
         DataHandler = load_fold_data(config, DataHandler, k)
-        config.model_num = 2#np.random.randint(6) + 1
-        if config.train_type in ['full_tl', 'LL_tl', 'gl_tl', 'no_em_tl', 'no_tl', 'no_pre_train']:
+        config.model_num = k+1 #np.random.randint(6) + 1
+        if config.train_type in ['full_tl', 'LL_tl', 'gl_tl', 'no_conv_tl', 'no_tl', 'no_pre_train']:
             if config.train_type == 'gl_tl':
                 config.init_lr = gl_init_lr
 
-            model, callback_list = models_util.load_pre_train_model(config, DataHandler)
+            model, callback_list = models_util.load_pre_train_model(config, DataHandler, model_string=model_string)
         # elif config.train_type == 'no_pre_train':
         #     model, callback_list = models_util.get_model(config, DataHandler)
         history = training_util.train_model(config, DataHandler, model, callback_list)
@@ -97,31 +99,37 @@ def cross_v_HPS(config, DataHandler):
     opt_epochs = round(np.mean(best_epoch_arr))
     return opt_epochs
 
-def train_10(config, DataHandler):
+def train_6(config, DataHandler, model_string='', return_model=False):
     spearman_result = []
-    DataHandler['X_train'] = np.concatenate((DataHandler['X_train'], DataHandler['X_valid']))
+    models =[]
+    DataHandler['X_train'] = np.concatenate((DataHandler['X_train'], DataHandler['X_valid'])) 
     DataHandler['dg_train'] = np.concatenate((DataHandler['dg_train'], DataHandler['dg_valid']))
     DataHandler['y_train'] = np.concatenate((DataHandler['y_train'], DataHandler['y_valid']))
 
-    for k in range(10):
+    for k in range(6):
         print(f'\nStarting training {k}')
-        config.model_num = 2#np.random.randint(6) + 1
+        config.model_num = k+1#np.random.randint(6) + 1
         # keras.backend.clear_session()
         if config.train_type == 'gl_tl':
             config.init_lr = gl_init_lr
 
-        model, callback_list = models_util.load_pre_train_model(config, DataHandler)
-
-        history = training_util.train_model(config, DataHandler, model, callback_list)
+        model, callback_list = models_util.load_pre_train_model(config, DataHandler, model_string='')
+        if return_model:
+            history, model = training_util.train_model(config, DataHandler, model, callback_list, final_models=True, return_model = return_model) 
+            models.append(model)
+        else:
+            history = training_util.train_model(config, DataHandler, model, callback_list, final_models=True) 
         spearman_result.append(testing_util.test_model(config, model, DataHandler))
 
     results_path = f'results/transfer_learning/{config.tl_data}/set{config.set}/'
     if not os.path.exists(results_path):
         os.makedirs(results_path)
 
-    results_path += f'{config.train_type}_10_mean.txt'
+    results_path += f'{config.train_type}_6_mean.txt'
     f = open(results_path, 'w')
     mean = sum(spearman_result) / len(spearman_result)
     f.write(f'spearmans - {spearman_result}, mean - {mean}\n')
     f.close()
+    if return_model:
+        return mean, models
     return mean

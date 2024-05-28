@@ -6,6 +6,8 @@ import pickle
 from scripts import feature_util
 from sklearn.preprocessing import MinMaxScaler
 import scipy as sp
+from new_version import redistribute_split
+from sklearn.model_selection import train_test_split
 
 
 def char2int(char):
@@ -26,13 +28,10 @@ def prepare_inputs(config):
     dir_path = f'data/tl_train/{config.tl_data_category}/{config.tl_data}/'
 
     if config.tl_data == 'leenay':
-        prepare_leenay(dir_path)
+        prepare_recalculated_leenay(dir_path)
 
     elif config.tl_data_category == 'U6T7':
         prepare_u6_t7_files(config, dir_path)
-
-    elif config.tl_data_category == 'crispr_il':
-        prepare_crispr_il_files(config, dir_path)
 
     else:
         print(f'Received wrong tl_data_category - {config.tl_data_category}')
@@ -43,106 +42,6 @@ def prepare_inputs(config):
 
 
 
-def prepare_crispr_il_files(config, dir_path):
-    main_dataframes_path = 'data/main_dataframes/crispr_il/'
-
-    if not os.path.exists(dir_path):
-        os.makedirs(dir_path)
-
-    if os.path.exists(dir_path + 'set4/train.csv'):
-        return
-
-    df = pd.read_csv(f'data/main_dataframes/crispr_il/{config.tl_data}.tsv', sep='\t')
-
-    seq = df['sgRNA_seq_0_char']
-    for i in range(1, 21):
-        col = f'sgRNA_seq_{i}_char'
-        seq = seq + df[col]
-
-
-
-    new_df = df[['efficiency']]
-    new_df.rename(columns={'efficiency': 'mean_eff'}, inplace=True)
-    new_df['21mer'] = seq
-
-    # down = df['downstream_seq_0_char']
-    # for i in range(1, 20):
-    #     col = f'downstream_seq_{i}_char'
-    #     down = down + df[col]
-    #
-    # up = df['upstream_seq_0_char']
-    # for i in range(1, 20):
-    #     col = f'upstream_seq_{i}_char'
-    #     up = up + df[col]
-    #
-    # new_df['downstream'] = down
-    # new_df['upstream'] = up
-
-    orig_size = new_df.shape[0]
-    new_df.dropna(inplace=True)
-    new_df.reset_index(drop=True, inplace=True)
-
-    no_none_size = new_df.shape[0]
-    print(f'There are {orig_size - no_none_size} samples with None value, left with {no_none_size} samples')
-
-    feature_options = {
-        "testing_non_binary_target_name": 'ranks',
-        'include_pi_nuc_feat': True,
-        "gc_features": True,
-        "nuc_features": True,
-        "include_Tm": True,
-        "include_structure_features": True,
-        "order": 3,
-        "num_proc": 20,
-        "normalize_features": None
-    }
-    feature_sets = feature_util.featurize_data(new_df, feature_options)
-    for feature in feature_sets.keys():
-        print(feature)
-        reindexed_feature_df = feature_sets[feature]
-        reindexed_feature_df.reset_index(inplace=True, drop=True)
-        new_df = pd.concat([new_df, reindexed_feature_df], axis=1)
-
-
-    new_df.to_csv(main_dataframes_path + f'{config.tl_data}.csv', index=False)
-
-    choosen_bio = ['GC > 10', 'GC < 10', 'GC count', 'Tm global_False', '5mer_end_False', '8mer_middle_False',
-                   '4mer_start_False', 'stem', 'dG', 'dG_binding_20', 'dg_binding_7to20']
-
-    name_dict = {}
-    for ind, bio_name in enumerate(choosen_bio):
-        name_dict[bio_name] = f'epi{ind + 1}'
-
-    new_df = new_df[['21mer', 'mean_eff'] + choosen_bio]
-    new_df.rename(columns=name_dict, inplace=True)
-
-    perm = np.arange(new_df.shape[0])
-    perm = np.random.permutation(perm)
-    test_size = round(len(perm) / 5)
-    sets = 5
-    for i in range(sets):
-        if i == sets - 1:
-            test_idx = perm[i * test_size: ]
-        else:
-            test_idx = perm[i*test_size: (i+1)*test_size]
-        test_df = new_df.iloc[test_idx]
-        train_val_df = new_df.drop(test_df.index)
-
-        merged = pd.merge(test_df, train_val_df, how='inner', on=['21mer'])  # inner for intersection - to show that there are not same gRNA in the train and test set
-        assert merged.shape[0] == 0
-
-        valid_df = train_val_df.sample(frac=0.2).sort_index()
-        train_df = train_val_df.drop(valid_df.index)
-        perm_path = dir_path + f'set{i}/'
-        os.mkdir(perm_path)
-        test_df.to_csv(perm_path + 'test.csv', index=False)
-        train_val_df.to_csv(perm_path + 'train_valid.csv', index=False)
-        valid_df.to_csv(perm_path + 'valid.csv', index=False)
-        train_df.to_csv(perm_path + 'train.csv', index=False)
-
-
-    a=0
-
 
 
 def prepare_u6_t7_files(config, dir_path):
@@ -151,7 +50,7 @@ def prepare_u6_t7_files(config, dir_path):
     if not os.path.exists(main_dataframes_path):
         os.makedirs(main_dataframes_path)
 
-        main_file = open('data/main_dataframes/13059_2016_1012_MOESM14_ESM.tsv')
+        main_file = open('data/main_dataframes/target.tsv')
 
         headers = main_file.readline()
         names = []
@@ -176,6 +75,12 @@ def prepare_u6_t7_files(config, dir_path):
         df = pd.read_csv(f'data/main_dataframes/u6t7/{config.tl_data}.tsv', sep='\t')
         df.rename(columns={'seq': '21mer'}, inplace=True)
         # df['21mer'] = df['21mer'].map(lambda x: x[0:21])
+
+        # Check if all rows have longSeq100Bp as a string and print the ones that don't
+        for index, row in df.iterrows():
+            if type(row['longSeq100Bp']) != str:
+                print(f'Row {index} is not a string but is a {type(row["longSeq100Bp"])}')
+                print(row['longSeq100Bp'])
 
         df['21mer'] = df['longSeq100Bp'].map(lambda x: x[30:51])
 
@@ -225,41 +130,17 @@ def prepare_u6_t7_files(config, dir_path):
         df.to_csv(main_dataframes_path + f'{config.tl_data}.csv', index=False)
 
     split_data_set(df, dir_path)
-    # test_df = df_new.sample(frac=0.2).sort_index()
-    # train_val_df = df_new.drop(test_df.index)
-    # merged = pd.merge(test_df, train_val_df, how='inner', on=['21mer']) #inner for intersection - to show that there are not same gRNA in the train and test set
-    # assert merged.shape[0] == 0
-    #
-    #
-    # valid_df = train_val_df.sample(frac=0.2).sort_index()
-    # train_df = train_val_df.drop(valid_df.index)
-    #
-    # test_df.to_csv(dir_path + 'test.csv', index=False)
-    # train_val_df.to_csv(dir_path + 'train_valid.csv', index=False)
-    # valid_df.to_csv(dir_path + 'valid.csv', index=False)
-    # train_df.to_csv(dir_path + 'train.csv', index=False)
+
 
 
 def split_data_set(df, dir_path):
-    perm = np.arange(df.shape[0])
-    perm = np.random.permutation(perm)
-    test_size = round(len(perm) / 5)
-    sets = 5
-    for i in range(sets):
-        if i == sets - 1:
-            test_idx = perm[i * test_size: ]
-        else:
-            test_idx = perm[i*test_size: (i+1)*test_size]
-        test_df = df.iloc[test_idx]
+    for i in range(5):
+        print(f'Creating set {i} based on seed {i}')
+        train_df, valid_df, test_df = redistribute_split.redistribute_tl_data(df, seed=i)
+        train_val_df = pd.concat([train_df, valid_df], axis=0)
         calc_spearman_for_comparison(test_df, dir_path, i)
 
-        train_val_df = df.drop(test_df.index)
-
-        merged = pd.merge(test_df, train_val_df, how='inner', on=['21mer'])  # inner for intersection - to show that there are not same gRNA in the train and test set
-        assert merged.shape[0] == 0
-
-        valid_df = train_val_df.sample(frac=0.2).sort_index()
-        train_df = train_val_df.drop(valid_df.index)
+       
         perm_path = dir_path + f'set{i}/'
         os.mkdir(perm_path)
         test_df.to_csv(perm_path + 'test.csv', index=False)
@@ -291,44 +172,97 @@ def prepare_leenay(dir_path):
         os.makedirs(dir_path)
     full_df = pd.read_csv('data/main_dataframes/leenay_full_data.csv')
 
-    perm = np.arange(full_df.shape[0])
-    perm = np.random.permutation(perm)
-    test_size = round(len(perm) / 5)
-    sets = 5
-    for i in range(sets):
-        if i == sets - 1:
-            test_idx = perm[i * test_size: ]
-        else:
-            test_idx = perm[i*test_size: (i+1)*test_size]
-        test_df = full_df.iloc[test_idx]
-        train_val_df = full_df.drop(test_df.index)
 
-        merged = pd.merge(test_df, train_val_df, how='inner', on=['21mer'])  # inner for intersection - to show that there are not same gRNA in the train and test set
-        assert merged.shape[0] == 0
+    
+    for i in range(5):
+        print(f'Creating set {i} based on seed {i}')
+        train_df, valid_df, test_df = redistribute_split.redistribute_tl_data(full_df, seed=i)
+        train_val_df = pd.concat([train_df, valid_df], axis=0)
 
-        valid_df = train_val_df.sample(frac=0.2).sort_index()
-        train_df = train_val_df.drop(valid_df.index)
+       
         perm_path = dir_path + f'set{i}/'
         os.mkdir(perm_path)
         test_df.to_csv(perm_path + 'test.csv', index=False)
         train_val_df.to_csv(perm_path + 'train_valid.csv', index=False)
         valid_df.to_csv(perm_path + 'valid.csv', index=False)
         train_df.to_csv(perm_path + 'train.csv', index=False)
-    # split_data_set(full_df, dir_path)
-    #
-    # test_df = full_df.sample(frac=0.2).sort_index()
-    # train_val_df = full_df.drop(test_df.index)
-    # merged = pd.merge(test_df, train_val_df, how='inner', on=['21mer']) #inner for intersection - to show that there are not same gRNA in the train and test set
-    # assert merged.shape[0] == 0
-    #
-    #
-    # valid_df = train_val_df.sample(frac=0.2).sort_index()
-    # train_df = train_val_df.drop(valid_df.index)
-    #
-    # test_df.to_csv(dir_path + 'test.csv', index=False)
-    # train_val_df.to_csv(dir_path + 'train_valid.csv', index=False)
-    # valid_df.to_csv(dir_path + 'valid.csv', index=False)
-    # train_df.to_csv(dir_path + 'train.csv', index=False)
+
+
+def prepare_recalculated_leenay(dir_path):
+    if os.path.exists(dir_path + 'set4/train.csv'):
+        return
+    if not os.path.exists(dir_path):
+        os.makedirs(dir_path)
+    df = pd.read_csv('data/main_dataframes/leenay_full_data.csv')
+
+    # remove preeixting epi columns
+    df = df.loc[:, ~df.columns.str.contains('^epi')]
+
+    feature_options = {
+        "testing_non_binary_target_name": 'ranks',
+        'include_pi_nuc_feat': True,
+        "gc_features": True,
+        "nuc_features": True,
+        "include_Tm": True,
+        "include_structure_features": True,
+        "order": 3,
+        "num_proc": 20,
+        "normalize_features": None
+    }
+    columns = list(df.columns)
+    feature_sets = feature_util.featurize_data(df, feature_options)
+    for feature in feature_sets.keys():
+        print(feature)
+        reindexed_feature_df = feature_sets[feature]
+        reindexed_feature_df.reset_index(inplace=True, drop=True)
+        df = pd.concat([df, reindexed_feature_df], axis=1)
+
+    choosen_bio = ['GC > 10', 'GC < 10', 'GC count', 'Tm global_False', '5mer_end_False', '8mer_middle_False',
+                    '4mer_start_False', 'stem', 'dG', 'dG_binding_20', 'dg_binding_7to20']
+
+    name_dict = {}
+    for ind, bio_name in enumerate(choosen_bio):
+        name_dict[bio_name] = f'epi{ind+1}'
+
+    df = df[columns + choosen_bio]
+    df.rename(columns=name_dict, inplace=True)
+    df.to_csv('data/main_dataframes/leenay_full_data_recalculated.csv', index=False)
+
+
+    for i in range(5):
+        print(f'Creating set {i} based on seed {i}')
+        train_df, valid_df, test_df = redistribute_split.redistribute_tl_data(df, seed=i)
+        train_val_df = pd.concat([train_df, valid_df], axis=0)
+
+       
+        perm_path = dir_path + f'set{i}/'
+        os.mkdir(perm_path)
+        test_df.to_csv(perm_path + 'test.csv', index=False)
+        train_val_df.to_csv(perm_path + 'train_valid.csv', index=False)
+        valid_df.to_csv(perm_path + 'valid.csv', index=False)
+        train_df.to_csv(perm_path + 'train.csv', index=False)
+
+
+def prepare_random_leenay(dir_path):
+    if os.path.exists(dir_path + 'set4/train.csv'):
+        return
+    if not os.path.exists(dir_path):
+        os.makedirs(dir_path)
+    full_df = pd.read_csv('data/main_dataframes/leenay_full_data.csv')
+
+
+    
+    for i in range(5):
+        print(f'Creating set {i} based on no seed')
+        train_val_df, test_df = train_test_split(full_df, test_size=0.2)
+        train_df, valid_df = train_test_split(train_val_df, test_size=0.2)
+        
+        perm_path = dir_path + f'set{i}/'
+        os.mkdir(perm_path)
+        test_df.to_csv(perm_path + 'test.csv', index=False)
+        train_val_df.to_csv(perm_path + 'train_valid.csv', index=False)
+        valid_df.to_csv(perm_path + 'valid.csv', index=False)
+        train_df.to_csv(perm_path + 'train.csv', index=False)
 
 
 def prepare_sequences(reads_sum, dir_path, old, config, add_new_features=False):

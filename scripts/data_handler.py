@@ -1,5 +1,6 @@
 import pickle
 import numpy as np
+from scripts.preprocess import Seq, MultiSeq
 
 def get_data(config):
     print('Reading data')
@@ -18,6 +19,10 @@ def get_data(config):
 
     with open(dir_path + 'train_seq.pkl', "rb") as fp:
         train_seq = pickle.load(fp)
+
+    if config.simulation_type == 'full_cross_v': #TODO added this, test
+        train_seq = MultiSeq.combine_multi_seqs(train_seq, test_seq)
+        
 
 
 

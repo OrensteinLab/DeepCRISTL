@@ -30,13 +30,19 @@ feature_options = {
                  "normalize_features":None
                  }
 
+
+
 ######parallelize processing########
 def parallelize_dataframe(df, func, num_partitions, num_processes=1):
 
     df_split = np.array_split( df, num_partitions )
+    #print(df_split[0].shape)
     # func(df)
-    pool = Pool( num_processes )
-    a = pool.map( func, df_split )
+
+    
+    a = []
+    for i in range(num_partitions):
+        a.append(func(df_split[i]))
 
     dataList = []
     aList = []
@@ -45,8 +51,8 @@ def parallelize_dataframe(df, func, num_partitions, num_processes=1):
         dataList.append( x[0] )
         aList.append( x[1] )
         bList.append( x[2] )
-    pool.close()
-    pool.join()
+    #pool.close()
+    #pool.join()
 
     return pandas.concat( dataList ), pandas.concat( aList ), pandas.concat( bList )
 
@@ -156,13 +162,13 @@ def Tm_feature(data, feature_options=None):
     sequence = data.values
     featarray = np.ones( (sequence.shape[0], 4) )
 
+    rna = False
     for i, seq in enumerate( sequence ):
-        rna = False
-        featarray[i, 0] = Tm.Tm_staluc( seq, rna=rna )  # 21mer Tm
-        featarray[i, 1] = Tm.Tm_staluc( seq[segments[0][0]:segments[0][1]],
-                                        rna=rna )  # 5nts immediately proximal of the NGG PAM
-        featarray[i, 2] = Tm.Tm_staluc( seq[segments[1][0]:segments[1][1]], rna=rna )  # 8-mer
-        featarray[i, 3] = Tm.Tm_staluc( seq[segments[2][0]:segments[2][1]], rna=rna )  # 4-mer
+        featarray[i, 0] = Tm.Tm_staluc( seq , rna = rna)  # 21mer Tm
+        featarray[i, 1] = Tm.Tm_staluc( seq[segments[0][0]:segments[0][1]],rna = rna
+                                        )  # 5nts immediately proximal of the NGG PAM
+        featarray[i, 2] = Tm.Tm_staluc( seq[segments[1][0]:segments[1][1]], rna = rna )  # 8-mer
+        featarray[i, 3] = Tm.Tm_staluc( seq[segments[2][0]:segments[2][1]], rna = rna)  # 4-mer
 
     feat = pandas.DataFrame( featarray, index=data.index,
                              columns=["Tm global_%s" % rna, "5mer_end_%s" % rna, "8mer_middle_%s" % rna,
@@ -377,6 +383,7 @@ def get_structural_feat(rows):
     df_feat = pandas.DataFrame( r ).astype( 'float64' )
     colums_name_list = ['stem', 'dG', 'dG_binding_20', 'dg_binding_7to20']
     df_feat.columns = colums_name_list
+
 
     return rows, df_feat, ba_rows
 

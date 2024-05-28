@@ -6,8 +6,8 @@ def get_parser():
     parser = argparse.ArgumentParser(description='Process some integers.')
 
     # Data
-    parser.add_argument('--pre_train_data', type=str, default=None)  # [DeepHF_55k, DeepHF_full, DeepHF_old]
-    parser.add_argument('--enzyme', type=str, default=None)  # [wt,esp,hf,multi_task]
+    parser.add_argument('--pre_train_data', type=str, default='DeepHF_old')  # [DeepHF_55k, DeepHF_full, DeepHF_old]
+    parser.add_argument('--enzyme', type=str, default='multi_task')  # [wt,esp,hf,multi_task]
     parser.add_argument('--tl_data', type=str, default=None)  # [leenay]
     parser.add_argument('--tl_data_category', type=str, default=None)  # [leenay]
     parser.add_argument('--mean_eff_col', type=str, default=None)  # Supply the relevant column from the tsv file (Example-for xu/wang data we choose wangOrig)

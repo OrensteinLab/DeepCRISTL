@@ -1,3 +1,21 @@
+
+import numpy as np
+from keras.models import *
+from keras.optimizers import *
+from sklearn.metrics import mean_squared_error, r2_score
+import scipy as sp
+from scripts import models_util
+from scripts import data_handler as dh
+from keras.callbacks import Callback
+from scripts_tl import data_handler_tl as dh_tl
+from scripts_tl import configurations_tl as cfg_tl
+from scripts_tl import cross_validation_tl as cv_tl
+from scripts import models_util
+import keras
+from scripts_tl import training_util_tl
+
+
+
 def train_model(config, DataHandler, model, callback_list, verbose=2):
     if verbose > 0:
         print('Start training')
@@ -22,5 +40,29 @@ def train_model(config, DataHandler, model, callback_list, verbose=2):
                         shuffle=True,
                         callbacks=callback_list,
                         )
+    
+    for key in history.history.keys():
+        print(key, history.history[key])
+
     return history
 
+
+
+
+def plot_loss_graph(config):
+    config.tl_data = 'morenoMateos2015'
+    config.set = 0
+    config.save_model = False
+    config.epochs = 1000
+
+
+    train_types = ['full_tl']
+    for train_type in train_types:
+        config.train_type = train_type
+        config.enzyme = 'multi_task'
+        DataHandler = dh_tl.get_data(config, config.set)
+        cv_tl.cross_v_HPS(config, DataHandler, n_folds=1)
+
+
+
+        

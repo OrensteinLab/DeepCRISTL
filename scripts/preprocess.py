@@ -3,6 +3,7 @@ import os
 import numpy as np
 import pickle
 from scripts import feature_util
+from new_version import redistribute_split
 import math
 
 # def create_dataframes(config):
@@ -14,7 +15,7 @@ import math
 #             full_df = full_df.iloc[:20]
 #             split_enzymes_dataframe(full_df, row_reads=True)
 #         elif config.data_source == 'old':
-#             full_df = pd.read_csv('data/main_dataframes/suplementry2_with_bio.csv')
+#             full_df = pd.read_csv('data/main_dataframes/supplementary2_with_bio.csv')
 #             split_enzymes_dataframe(full_df, row_reads=False)
 #
 #             a=0
@@ -88,8 +89,6 @@ def prepare_inputs(config):
 
 
 
-
-
 def prepare_old_data(data_columns):
     dir_path = 'data/pre_train/DeepHF_old/'
     if os.path.exists(dir_path + 'train.csv'):
@@ -97,10 +96,10 @@ def prepare_old_data(data_columns):
     if not os.path.exists(dir_path):
         os.makedirs(dir_path)
 
-    if os.path.exists('data/main_dataframes/suplementry2_with_bio.csv'):
-        full_df = pd.read_csv('data/main_dataframes/suplementry2_with_bio.csv')
+    if os.path.exists('data/main_dataframes/supplementary2_with_bio.csv'):
+        full_df = pd.read_csv('data/main_dataframes/supplementary2_with_bio.csv')
     else:
-        df = pd.read_csv('data/main_dataframes/suplementry2.csv')
+        df = pd.read_csv('data/main_dataframes/dhf_pretrain.csv')
 
         feature_options = {
             "testing_non_binary_target_name": 'ranks',
@@ -114,12 +113,14 @@ def prepare_old_data(data_columns):
             "normalize_features": None
         }
         feature_sets = feature_util.featurize_data(df, feature_options)
+
+
         for feature in feature_sets.keys():
             print(feature)
             reindexed_feature_df = feature_sets[feature]
             reindexed_feature_df.reset_index(inplace=True, drop=True)
             df = pd.concat([df, reindexed_feature_df], axis=1)
-        df.to_csv('data/main_dataframes/suplementry2_with_bio.csv', index=False)
+        df.to_csv('data/main_dataframes/supplementary2_with_bio.csv', index=False)
         full_df = df
 
     full_df = full_df[data_columns]
@@ -128,21 +129,15 @@ def prepare_old_data(data_columns):
         name_dict[bio_name] = f'epi{ind+1}'
     full_df.rename(columns=name_dict, inplace=True)
 
+    train_df, val_df, test_df = redistribute_split.redistribute_dhf_pretrain_data(full_df)
 
-    wt_cond = full_df['wt_mean_eff'].notna()
-    esp_cond = full_df['esp_mean_eff'].notna()
-    hf_cond = full_df['hf_mean_eff'].notna()
 
-    test_df = full_df[wt_cond & esp_cond & hf_cond].sample(frac=0.15).sort_index()
-    train_val_df = full_df.drop(test_df.index)
-
-    valid_full_df = train_val_df.sample(frac=0.1).sort_index()
-    train_full_df = train_val_df.drop(valid_full_df.index)
+    train_val_df = pd.concat([train_df, val_df], axis=0)
 
     test_df.to_csv(dir_path + 'test.csv', index=False)
     train_val_df.to_csv(dir_path + 'train_valid.csv', index=False)
-    valid_full_df.to_csv(dir_path + 'valid.csv', index=False)
-    train_full_df.to_csv(dir_path + 'train.csv', index=False)
+    val_df.to_csv(dir_path + 'valid.csv', index=False)
+    train_df.to_csv(dir_path + 'train.csv', index=False)
 
 
 def prepare_dataframes(data_columns):
@@ -248,6 +243,17 @@ class MultiSeq(object):
     def add_seq(self, enzyme, seq, biofeat, y, conf=None):
         self.enzymes_seq[enzyme].add_seq(seq, biofeat, y, conf)
 
+    @staticmethod
+    def combine_multi_seqs(multiseq1, multiseq2):
+        combined_multiseq = MultiSeq()
+        for enzyme in combined_multiseq.enzymes_seq:
+            combined_multiseq.enzymes_seq[enzyme].combine_seqs(multiseq1.enzymes_seq[enzyme])
+            combined_multiseq.enzymes_seq[enzyme].combine_seqs(multiseq2.enzymes_seq[enzyme])
+        return combined_multiseq
+
+
+            
+
 
 class Seq(object):
     # This class is the serialized data for one enzyme only
@@ -276,6 +282,14 @@ class Seq(object):
 
         if conf is not None:
             self.confidence = np.append(self.confidence, np.array([conf], dtype=np.uint16), axis=0)
+
+
+    def combine_seqs(self, other_seq):
+        self.X = np.concatenate((self.X, other_seq.X), axis=0)
+        self.X_biofeat = np.concatenate((self.X_biofeat, other_seq.X_biofeat), axis=0)
+        self.y = np.append(self.y, other_seq.y, axis=0)
+        self.confidence = np.append(self.confidence, other_seq.confidence, axis=0)
+
 
 
     # def get_data(self):

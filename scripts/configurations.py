@@ -27,7 +27,7 @@ def get_parser():
     parser.add_argument('--transfer_learning','-tl', dest='transfer_learning', action='store_true')
     parser.add_argument('--no_weights', dest='no_weights', action='store_true')
     parser.add_argument('--data_name', type=str, default=None)  # Relevant only for transfer learning
-    parser.add_argument('--pre_train_data', type=str, default='DeepHF_full')  # [DeepHF_55k, DeepHF_full, DeepHF_old]
+    parser.add_argument('--pre_train_data', type=str, default='DeepHF_old')  # [DeepHF_55k, DeepHF_full, DeepHF_old]
 
 
 
@@ -49,7 +49,7 @@ def get_parser():
     parser.add_argument('-no_bio', '--no_biofeatures', dest='has_biofeatures', action='store_false')
     parser.add_argument('-mt', '--model_type', type=str, default='lstm')
     parser.add_argument('--weighted_loss', dest='weighted_loss', action='store_true')  # weighted_loss / row_reads model
-    parser.add_argument('--model_name', type=str, default='model_2')
+    parser.add_argument('--model_name', type=str, default='model_1') #TODO was 2???
 
 
     # GL model
@@ -62,7 +62,7 @@ def get_parser():
 
     config = parser.parse_args()
     # Sanity check
-    if config.enzyme is None and config.simulation_type != 'preprocess':
+    if config.enzyme is None and config.simulation_type != 'preprocess' and config.simulation_type != 'postprocess' and config.simulation_type != 'train_for_emsemble_size_graph':
         print('No data type received >>>> exiting')
         exit(1)
 

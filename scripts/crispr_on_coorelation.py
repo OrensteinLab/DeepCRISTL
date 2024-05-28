@@ -5,7 +5,7 @@ from scipy import stats
 crispr_on = pd.read_excel('../data/main_dataframes/crispr on data.xlsx',engine='openpyxl', sheet_name='spCas9_eff_D10-dox')
 crispr_on = crispr_on.rename(columns={'gRNA': 'gRNA_Seq'})
 
-deep_hf = pd.read_csv('../data/main_dataframes/suplementry2.csv')
+deep_hf = pd.read_csv('../data/main_dataframes/supplementary2.csv')
 
 wt_deep_hf = deep_hf[['gRNA_Seq', 'Wt_Efficiency']]
 wt_deep_hf = wt_deep_hf.dropna()

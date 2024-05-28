@@ -5,6 +5,8 @@ import scipy as sp
 import os
 from keras.models import load_model, Model
 import keras
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import pandas as pd
 import pickle
@@ -45,12 +47,17 @@ def final_results():
 
 
 def ensemble_vs_num_of_models(config):
+    # TODO: change to whatever is needed
+    #enzymes = ['wt']
+    #enzymes = ['esp', 'hf']
+    #enzymes = ['esp']
     enzymes = ['wt', 'esp', 'hf', 'multi_task']
-    # enzymes = ['multi_task']
+
 
     if os.path.exists('results/pre_train/spearmans.pkl'):
         with open('results/pre_train/spearmans.pkl', "rb") as fp:
             spearmans = pickle.load(fp)
+            print(spearmans)
     else:
         spearmans = {}
         for enzyme in enzymes:
@@ -76,12 +83,13 @@ def test_means(config, DataHandler):
 
     all_models = []
     model_ind = 0
-    model_path = models_dir + 'model_0/model'
+    model_path = models_dir + 'model_0/model' # TODO  change to 0
 
     if config.enzyme == 'multi_task':
         predictions = {'wt': [], 'esp': [], 'hf': []}
     else:
         predictions = []
+
 
     # Receiving predictions
     while os.path.exists(model_path):
@@ -114,10 +122,14 @@ def test_means(config, DataHandler):
         for enzyme in enzymes:
 
             enz_predictions = np.array(predictions[enzyme])
+            #print(enz_predictions.shape)
             enz_predictions = np.squeeze(enz_predictions)
-            final_preds = np.zeros((test_prediction.shape[0], len(enz_predictions)))
+            #print(enz_predictions.shape)
+            final_preds = np.zeros((enz_predictions.shape[1], len(enz_predictions)))
+            #print(final_preds.shape)
             for i in range(len(enz_predictions)):
                 preds = enz_predictions[:i + 1]
+                #print(preds.shape)
                 if i == 0:
                     final_preds[:, i] = preds
                 else:
@@ -131,7 +143,9 @@ def test_means(config, DataHandler):
                 spearmans[enzyme].append(spearman)
     else:
         predictions = np.array(predictions)
-        predictions = np.squeeze(predictions)
+        #print(predictions.shape)
+        predictions = np.squeeze(predictions, axis=2)
+        #print(predictions.shape)
         final_preds =  np.zeros((test_prediction.shape[0], len(predictions)))
         for i in range(len(predictions)):
             preds = predictions[:i+1]
@@ -139,12 +153,11 @@ def test_means(config, DataHandler):
                 final_preds[:, i] = preds
             else:
                 final_preds[:, i] = np.mean(preds, axis=0)
-
         spearmans = []
         for i in range(final_preds.shape[1]):
             pred = final_preds[:, i]
             spearman = sp.stats.spearmanr(test_true_label, pred)[0]
-            print(spearman)
+            #print(spearman)
             spearmans.append(spearman)
 
     return spearmans
@@ -172,7 +185,8 @@ def test_means(config, DataHandler):
 def plot_spearman_curve(spearmans):
     enzymes = ['wt', 'esp', 'hf']
 
-    labels = {'wt': 'WT', 'esp': 'ESP', 'hf': 'HF'}
+    labels = {'wt': 'WT', 'esp': 'Esp', 'hf': 'HF'}
+    enzyme_labels = ['WT', 'Esp', 'HF']
     colors = {'wt': 'r', 'esp': 'g', 'hf': 'b'}
     enzyme_legend = []
     sing_vs_multi_legend = []
@@ -193,16 +207,16 @@ def plot_spearman_curve(spearmans):
             enzyme_legend.append(react)
 
 
-    leg2 = plt.legend(enzyme_legend, enzymes, bbox_to_anchor=(0.65, 0.22))
-    leg3 = plt.legend([enzyme_legend[0], sing_vs_multi_legend[0]], ['Single-task', 'Multi-task'],  bbox_to_anchor=(0.9, 0.22))
+    leg2 = plt.legend(enzyme_legend, enzyme_labels, bbox_to_anchor=(0.65, 0.22))
+    leg3 = plt.legend([enzyme_legend[0], sing_vs_multi_legend[0]], ['Single-task', 'Multi-task'],  bbox_to_anchor=(0.92, 0.22)) #TODO: add this back when have multi task
     plt.gca().add_artist(leg2)
 
     # plt.legend(bbox_to_anchor=(0.3, 0.4))
     plt.ylabel('Spearman')
     plt.xlabel('Number of models')
     plt.xticks(np.arange(1, 21))
-    plt.title('Ensemble model spearman result Vs number of models')
-    plt.show()
+    #plt.title('Ensemble model spearman result Vs number of models')
+    plt.savefig('results/pre_train/ensemble_vs_num_of_models.png')
 
 
 

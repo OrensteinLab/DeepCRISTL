@@ -7,8 +7,8 @@ from scripts import training_util
 from scripts import configurations as cfg
 from scripts import preprocess
 from scripts import data_handler as dh
-from scripts import fastq_preprocess
-from scripts import models_util
+from scripts import fastq_preprocess 
+from scripts import models_util 
 from scripts import testing_util
 from scripts import hyper_parameter_search as hps
 from scripts import cross_validation as cv
@@ -33,9 +33,11 @@ if __name__ == '__main__':
     #     line = f.readline()
     #     print(line)
     # Using only needed memory on GPU
-    con = tf.compat.v1.ConfigProto()
-    con.gpu_options.allow_growth = True
-    tf.compat.v1.keras.backend.set_session(tf.compat.v1.Session(config=con))
+
+    # TODO: uncomment it?
+    #con = tf.compat.v1.ConfigProto()
+    #con.gpu_options.allow_growth = True
+    #tf.compat.v1.keras.backend.set_session(tf.compat.v1.Session(config=con))
 
 
 
@@ -47,6 +49,21 @@ if __name__ == '__main__':
 
     if config.simulation_type == 'preprocess':
         preprocess.prepare_inputs(config)
+
+
+    if config.simulation_type == 'train_for_emsemble_size_graph':
+        enzymes = ['wt', 'esp', 'hf', 'multi_task']
+        MODEL_COUNT = 20
+        for enzyme in enzymes:
+            for i in range(MODEL_COUNT):
+                print(f'Training model {i} for enzyme {enzyme} for ensemble size graph')
+                config.enzyme = enzyme
+                config = cfg.get_optimized_params(config)
+                config.save_model = True
+                DataHandler = dh.get_data(config)
+                model, callback_list = models_util.get_model(config, DataHandler)
+                history = training_util.train_model(config, DataHandler, model, callback_list)
+                testing_util.test_model(config, model, DataHandler['test'])
 
     if config.simulation_type == 'train':
         # Initializing random seed
@@ -78,6 +95,10 @@ if __name__ == '__main__':
 
     if config.simulation_type == 'postprocess':
         postprocess.postprocess(config)
+
+    if config.simulation_type == 'plot_loss_graph':
+        config.save_model = False
+        training_util.plot_loss_graph(config)
 
     if config.simulation_type == 'test':
         DataHandler = dh.get_data(config)

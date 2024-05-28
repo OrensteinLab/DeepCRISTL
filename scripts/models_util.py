@@ -1,10 +1,9 @@
 import keras
 from keras.preprocessing import text
 from keras.preprocessing import sequence
-from keras.layers import merge, Embedding, Bidirectional, concatenate, Conv2D, BatchNormalization, MaxPool2D
-from keras.layers.core import *
+from keras.layers import Embedding, Bidirectional, concatenate, Conv2D, BatchNormalization, MaxPool2D
+from keras.layers import *
 from keras.models import *
-from keras.layers.recurrent import LSTM
 from keras.callbacks import EarlyStopping
 import numpy as np
 from keras.callbacks import Callback
