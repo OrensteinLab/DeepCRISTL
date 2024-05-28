@@ -189,6 +189,9 @@ def generate_one_heatmap(dataframe):
     # add the no_tl_col to the reordered_df
     reordered_df['no_transfer_learning'] = no_tl_col
 
+    # rename 'no_transfer_learning' to 'no transfer-learning'
+    reordered_df = reordered_df.rename(columns={'no_transfer_learning': 'no transfer-learning'})
+
     print(reordered_df)
    
     
@@ -233,8 +236,8 @@ def generate_one_heatmap(dataframe):
     #cbar.ax.set_title('Spearman\'s R', pad=10, fontsize=18)
 
     # Set labels for the axes
-    plt.xlabel('Model', fontsize=16, labelpad=20)
-    plt.ylabel('Dataset', fontsize=16, labelpad=20)
+    plt.xlabel('Training dataset', fontsize=16, labelpad=20)
+    plt.ylabel('Test dataset', fontsize=16, labelpad=20)
 
     # Set the title for the heatmap
     #plt.title('Spearmans R', fontsize=20)

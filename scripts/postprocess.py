@@ -185,7 +185,8 @@ def test_means(config, DataHandler):
 def plot_spearman_curve(spearmans):
     enzymes = ['wt', 'esp', 'hf']
 
-    labels = {'wt': 'WT', 'esp': 'ESP', 'hf': 'HF'}
+    labels = {'wt': 'WT', 'esp': 'Esp', 'hf': 'HF'}
+    enzyme_labels = ['WT', 'Esp', 'HF']
     colors = {'wt': 'r', 'esp': 'g', 'hf': 'b'}
     enzyme_legend = []
     sing_vs_multi_legend = []
@@ -206,7 +207,7 @@ def plot_spearman_curve(spearmans):
             enzyme_legend.append(react)
 
 
-    leg2 = plt.legend(enzyme_legend, enzymes, bbox_to_anchor=(0.65, 0.22))
+    leg2 = plt.legend(enzyme_legend, enzyme_labels, bbox_to_anchor=(0.65, 0.22))
     leg3 = plt.legend([enzyme_legend[0], sing_vs_multi_legend[0]], ['Single-task', 'Multi-task'],  bbox_to_anchor=(0.92, 0.22)) #TODO: add this back when have multi task
     plt.gca().add_artist(leg2)
 
