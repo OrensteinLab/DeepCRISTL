@@ -1,71 +1,107 @@
-# System requirements
-* python=3.8
-* numpy=1.14.0
-* scipy=1.0.0
-* h5py=2.7.1
-* tensorflow=1.8.0
-* keras=2.1.6
-* scikit-learn=0.19.1
-* biopython=1.71
-* viennarna=2.4.5
-* cutadapt=1.18
-* matplotlib
-* DotMap
-* GPyOpt
-* pandas
 
-We have used the code of the DeepHF model as our baseline code.
-#  Pre-train model
-For training the pre-train model, use the file - "main.py".
-* -s_type = the simulation type:
-  * preprocess - preparing the data in objects and divide to train and test
-  * train - training the model
-  * postprocess - geting plots of training results
-* --enzyme = the enzyme data that will be used as pre-train data - [wt, esp, hf, multi_task]
-* Example code:
--s_type train --pre_train_data DeepHF_old   --enzyme multi_task
+# DeepCRISTL
 
-# Transfer learning model
-For training the model on the endogenous and functional data, use the file - "main_tl.py"
-* -s_type = the simulation type:
-  * preprocess - prepare data
-  * full_sim - run all transfer learning approaches
-  * postprocess - recive plots of results
+A tool to predict CRISPR/Cas9 gRNA on-target efficiency for specific cellular contexts utilizing transfer-learning. The repository for the paper [DeepCRISTL: deep transfer learning to predict CRISPR/Cas9 functional and endogenous on-target editing efficiency](https://academic.oup.com/bioinformatics/article/38/Supplement_1/i161/6617528)
 
-* --tl_data = The data which will be fine tuned on
-*  --tl_data_category = The type of fine tuned data - [u6t7, leenay]
-* Example code:
--s_type postprocess --tl_data doench2014-Hs --pre_train_data DeepHF_old  --tl_data_category u6t7 --enzyme wt
+## Requirements
+
+Our tool has been tested on the following configuration on a linux machine:
+ - python 3.6.13
+ - h5py 2.10.0
+ - Keras 2.4.3
+ - Levenshtein 0.21.1
+ - logomaker 0.8
+ - matplotlib 2.2.0
+ - numpy 1.19.5
+ - pandas 1.1.5
+ - scikit-learn 0.20.0
+ - scipy 1.5.4
+ - seaborn 0.11.2
+ - tensorflow 2.4.1
+ - CRISPRoff : 1.1.2
+ - ViennaRNA 2.5.0a5
+ 
 
 
-# Transfer learning with CRISPROn model
-run the "CRISPRon/main.py" file with the following configurations:
 
-Start from preprocessing the data using the followin code: 
--s_type preprocess --tl_data_category U6T7 --tl_data chari2015Train293T (choose the relevant expirement)
+## Running the Tool
 
-Then you can run the full simulation with:
--s_type full_Sim --tl_data_category U6T7 --tl_data chari2015Train293T
+### Checking Vvailable Models
+To list available models, use the following command:
+```sh
+python tool.py --action list
+```
+Note that the model `no_transfer_learning` is always available
 
-For reciving the finall results, run the postprocess:
--s_type postprocess --tl_data_category U6T7 --tl_data chari2015Train293T
+### Prediction
+#### Example input file: `example.csv`
 
-# Model interpertation
-For interperting the expirements, run the file "ModelInterpertations/model_interpertation.py". 
-For any new expirement, add the expirement name to the expirement list in line 112. 
-You can choose the pre train model with the "--enzyme" option. FOr the multi task model, write multi_task as in the example.
-* Example code:
--s_type interpertation --enzyme multi_task --pre_train_data DeepHF_old
+| 30mer                         |
+|--------------------------------|
+|CCTCGTTGCTATCTACCACAAGCAGGGGCG|
+|CAACTTCTTCTCAGTTCAAGTAACAGGTAA|
+|GGAATTCCGGGCATCCCTGTACAAGGGCGT|
+|GAACTCGGCATTCGAGCGAAACTGGGGCTG|
+|CACGACCAGTGCCCAAAACAGCTTAGGAGA|
+|GACTACATGAACATGACTCCCCGGAGGCCT|
+|CAATGACACTCAGGCTGCTGTTCTTGGCTC|
+|CGTCGCTGTTCACGCCCTTGTACAGGGATG|
+|ATTGCTCCTCTCGTTGTCTAGGTAAGGCGG|
+|CCTCCGCCTTACCTAGACAACGAGAGGAGC|
+|CCTCTCGTTGTCTAGGTAAGGCGGAGGGTA|
+|GCCCTCATCAGAACAATGACACTCAGGCTG|
+|TTTGTTATGGCTTGCTAGTGACAGTGGCTC|
+|CTGGATAGGGGTCCCTGTCAGGGGCGGTAC|
+|TGTACAAGGGCGTGAACAGCGACGTGGAAG|
 
-# Data:
-All the data are publicly available at the following papers:
-* DeepHF - https://www.nature.com/articles/s41467-019-12281-8
-* Leenay - https://www.nature.com/articles/s41587-019-0203-2
-* Haussler - https://link.springer.com/article/10.1186/s13059-016-1012-2
-* CISPROn - https://www.nature.com/articles/s41467-021-23576-0
 
-# Trained models:
-All models can be found and downloaded at:
-https://drive.google.com/drive/folders/1E6_o5rqv0-_KhWHkgmlbuxbw2PNGw-E0?usp=sharing
+#### How to predict
+The input file should be located at `CRISPRon/tool data/input` and should be a CSV file containing only 1 column `30mer`. For a specific input file `X.csv` and a model `M`, use the following command:
 
-  
+```sh
+python tool.py --action prediction --input_file X --model_to_use M
+```
+
+The prediction results will appear in `CRISPRon/tool data/output`
+
+### Fine-Tuning on New Data
+#### Example Target File: `example.csv`
+
+| 30mer                        | mean_eff          |
+|------------------------------|-------------------|
+| AGGAAGCGTACCCCCAGGTCTTGCAGGTCC | 0.0058362780473332 |
+| TTTTCCAATTGCCTTCAGATCAATAGGCTT | 0.0               |
+| CCTTACAGGGCGCTCCATATTCGCAGGTGC | 0.1106926468458475 |
+| TGTCCTCGTCCTCCAGCTGTTATCTGGAAG | 0.0094791555458701 |
+| ACCTTCTCAATTAAATCTGACGTCTGGGGT | 0.0986944806386289 |
+| ACCATCCGCCTGCGAGGCACGTAACGGAGC | 0.0050379567194411 |
+| TCGGCATGATTGCCAACTCCGTGGTGGTCT | 0.0788925346952764 |
+| ATAGTTTCTTTGGTCCCACGCCTGCGGCAC | 0.057214890077075  |
+| CTTACCCACTACTATGATGATGCCCGGACC | 0.1051214533208349 |
+| ATGTGCGCACCTGCATCCCCAAAGTGGAGC | 0.0745012100079162 |
+| TTCCTGTAGGAGCACTGTCGACCCTGGCAT | 0.0805055090371068 |
+| TGGCCAAGCCGTGGAGTGCTGCCAAGGGGA | 0.5331169658510118 |
+| AACACGGTTCAACACCAGTTTGATTGGTTC | 0.0283029080994734 |
+| GCTTGCGATGCCGGTACATCCAAAAGGCCA | 0.0448409515847471 |
+| ... | ...
+
+To fine-tune on new data, place the datasets CSV file in `CRISPRon/tool data/datasets`. The CSV file should contain 2 columns: `30mer` and `mean_eff`, with `mean_eff` normalized between 0 and 1. For a specific dataset file `D.csv`, use the following command:
+
+`python tool.py --action new_data --new_data_path D`
+
+Note that this will create a model with the same name as the fine-tune csv file.
+
+
+
+## Acknowledgements
+
+ - [CRISPRon](https://www.nature.com/articles/s41467-021-23576-0) for the architecture and pre-training data.
+ - [Kim2019](https://www.science.org/doi/10.1126/sciadv.aax9249) for part of the pre-training data.
+ - [DeepHF](https://www.nature.com/articles/s41467-019-12281-8) for models tested in the original paper.
+ - [CRISPRoff](https://bulldogjob.com/news/449-how-to-write-a-good-readme-for-your-github-project) for the feature calculation used as part of the CRISPRon pipeline.
+  - [Haussler](https://link.springer.com/article/10.1186/s13059-016-1012-2) for the target datasets.
+- [Leenay](https://www.nature.com/articles/s41587-019-0203-2) for the target dataset.
+
+
+## Contact
+In case of issues with the tool, you may contact us at yaron.orenstein@biu.ac.il
