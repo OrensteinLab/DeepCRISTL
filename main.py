@@ -1,6 +1,7 @@
 import tensorflow as tf
 import numpy as np
 import keras
+import os
 
 # my scripts
 from scripts import training_util
@@ -38,6 +39,9 @@ if __name__ == '__main__':
     #con = tf.compat.v1.ConfigProto()
     #con.gpu_options.allow_growth = True
     #tf.compat.v1.keras.backend.set_session(tf.compat.v1.Session(config=con))
+
+    # Create hirarchy if not exists
+    # create folder 'tool data'
 
 
 
