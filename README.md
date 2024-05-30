@@ -93,7 +93,7 @@ Note that this will create a model with the same name as the fine-tune CSV file.
 
 
 
-## Acknowledgements
+## References
 
  - [CRISPRon](https://www.nature.com/articles/s41467-021-23576-0) for the architecture and pre-training data.
  - [Kim2019](https://www.science.org/doi/10.1126/sciadv.aax9249) for part of the pre-training data.
