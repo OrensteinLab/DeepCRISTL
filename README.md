@@ -5,7 +5,7 @@ A tool to predict CRISPR/Cas9 gRNA on-target efficiency for specific cellular co
 
 ## Requirements
 
-Our tool has been tested on the following configuration on a linux machine:
+Our tool has been tested on the following configuration on a Linux machine:
  - python 3.6.13
  - h5py 2.10.0
  - Keras 2.4.3
@@ -26,15 +26,15 @@ Our tool has been tested on the following configuration on a linux machine:
 
 ## Running the Tool
 
-### Checking Vvailable Models
+### Checking Available Models
 To list available models, use the following command:
 ```sh
 python tool.py --action list
 ```
-Note that the model `no_transfer_learning` is always available
+Note that the model `no_transfer_learning` is always available.
 
 ### Prediction
-#### Example input file: `example.csv`
+#### Example Input File: `example.csv`
 
 | 30mer                         |
 |--------------------------------|
@@ -56,7 +56,7 @@ Note that the model `no_transfer_learning` is always available
 
 
 #### How to predict
-The input file should be located at `CRISPRon/tool data/input` and should be a CSV file containing only 1 column `30mer`. For a specific input file `X.csv` and a model `M`, use the following command:
+The input file should be located at `CRISPRon/tool data/input` and should be a CSV file containing only one column `30mer`. For a specific input file `X.csv` and a model `M`, use the following command:
 
 ```sh
 python tool.py --action prediction --input_file X --model_to_use M
@@ -85,11 +85,11 @@ The prediction results will appear in `CRISPRon/tool data/output`
 | GCTTGCGATGCCGGTACATCCAAAAGGCCA | 0.0448409515847471 |
 | ... | ...
 
-To fine-tune on new data, place the datasets CSV file in `CRISPRon/tool data/datasets`. The CSV file should contain 2 columns: `30mer` and `mean_eff`, with `mean_eff` normalized between 0 and 1. For a specific dataset file `D.csv`, use the following command:
+To fine-tune on new data, place the datasets CSV file in `CRISPRon/tool data/datasets`. The CSV file should contain two columns: `30mer` and `mean_eff`, with `mean_eff` normalized between 0 and 1. For a specific dataset file `D.csv`, use the following command:
 
 `python tool.py --action new_data --new_data_path D`
 
-Note that this will create a model with the same name as the fine-tune csv file.
+Note that this will create a model with the same name as the fine-tune CSV file.
 
 
 
@@ -104,4 +104,4 @@ Note that this will create a model with the same name as the fine-tune csv file.
 
 
 ## Contact
-In case of issues with the tool, you may contact us at yaron.orenstein@biu.ac.il
+In case of issues with the tool, you may contact us at yaron.orenstein@biu.ac.il.
