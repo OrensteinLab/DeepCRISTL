@@ -18,7 +18,7 @@ Our tool has been tested on the following configuration on a Linux machine:
  - scipy 1.5.4
  - seaborn 0.11.2
  - tensorflow 2.4.1
- - CRISPRoff : 1.1.2
+ - CRISPRoff 1.1.2
  - ViennaRNA 2.5.0a5
  
 
