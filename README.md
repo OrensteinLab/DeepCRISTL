@@ -48,7 +48,9 @@ To fine-tune on new data, place the datasets CSV file in `CRISPRon/tool data/dat
 
 `python tool.py --action new_data --new_data_path <dataset_name>`
 
-Make sure that `<dataset_name>` doesn't contain the `.csv` extension. This command will create a model with the same name as the fine-tune CSV file.
+Make sure that `<dataset_name>` doesn't contain the `.csv` extension.
+
+This command will create a model with the same name as the fine-tune CSV file.
 
 
 
