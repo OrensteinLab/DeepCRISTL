@@ -34,62 +34,21 @@ python tool.py --action list
 Note that the model `no_transfer_learning` is always available.
 
 ### Prediction
-#### Example Input File: `example.csv`
-
-| 30mer                         |
-|--------------------------------|
-|CCTCGTTGCTATCTACCACAAGCAGGGGCG|
-|CAACTTCTTCTCAGTTCAAGTAACAGGTAA|
-|GGAATTCCGGGCATCCCTGTACAAGGGCGT|
-|GAACTCGGCATTCGAGCGAAACTGGGGCTG|
-|CACGACCAGTGCCCAAAACAGCTTAGGAGA|
-|GACTACATGAACATGACTCCCCGGAGGCCT|
-|CAATGACACTCAGGCTGCTGTTCTTGGCTC|
-|CGTCGCTGTTCACGCCCTTGTACAGGGATG|
-|ATTGCTCCTCTCGTTGTCTAGGTAAGGCGG|
-|CCTCCGCCTTACCTAGACAACGAGAGGAGC|
-|CCTCTCGTTGTCTAGGTAAGGCGGAGGGTA|
-|GCCCTCATCAGAACAATGACACTCAGGCTG|
-|TTTGTTATGGCTTGCTAGTGACAGTGGCTC|
-|CTGGATAGGGGTCCCTGTCAGGGGCGGTAC|
-|TGTACAAGGGCGTGAACAGCGACGTGGAAG|
-
-
-#### How to predict
-The input file should be located at `CRISPRon/tool data/input` and should be a CSV file containing only one column `30mer`. For a specific input file `X.csv` and a model `M`, use the following command:
+The input file should be located at `CRISPRon/tool data/input` and should be a CSV file containing only one column `30mer`. An example file named `example.csv` is provided with the sequences of the dataset `doench2014-Hs`. To run the script, input the following command:
 
 ```sh
-python tool.py --action prediction --input_file X --model_to_use M
+python tool.py --action prediction --input_file <file_path> --model_to_use <model_name>
 ```
+Make sure that `<file_path>` doesn't contain the `.csv` extension. 
 
 The prediction results will appear in `CRISPRon/tool data/output`
 
 ### Fine-Tuning on New Data
-#### Example Target File: `example.csv`
+To fine-tune on new data, place the datasets CSV file in `CRISPRon/tool data/datasets`. The CSV file should contain two columns: `30mer` and `mean_eff`, with `mean_eff` normalized between 0 and 1. An example file named `example.csv` is provided with the sequences and labels for the dataset `doench2014-Hs`. To run the script, input the following command:
 
-| 30mer                        | mean_eff          |
-|------------------------------|-------------------|
-| AGGAAGCGTACCCCCAGGTCTTGCAGGTCC | 0.0058362780473332 |
-| TTTTCCAATTGCCTTCAGATCAATAGGCTT | 0.0               |
-| CCTTACAGGGCGCTCCATATTCGCAGGTGC | 0.1106926468458475 |
-| TGTCCTCGTCCTCCAGCTGTTATCTGGAAG | 0.0094791555458701 |
-| ACCTTCTCAATTAAATCTGACGTCTGGGGT | 0.0986944806386289 |
-| ACCATCCGCCTGCGAGGCACGTAACGGAGC | 0.0050379567194411 |
-| TCGGCATGATTGCCAACTCCGTGGTGGTCT | 0.0788925346952764 |
-| ATAGTTTCTTTGGTCCCACGCCTGCGGCAC | 0.057214890077075  |
-| CTTACCCACTACTATGATGATGCCCGGACC | 0.1051214533208349 |
-| ATGTGCGCACCTGCATCCCCAAAGTGGAGC | 0.0745012100079162 |
-| TTCCTGTAGGAGCACTGTCGACCCTGGCAT | 0.0805055090371068 |
-| TGGCCAAGCCGTGGAGTGCTGCCAAGGGGA | 0.5331169658510118 |
-| AACACGGTTCAACACCAGTTTGATTGGTTC | 0.0283029080994734 |
-| GCTTGCGATGCCGGTACATCCAAAAGGCCA | 0.0448409515847471 |
-| ... | ...
+`python tool.py --action new_data --new_data_path <dataset_name>`
 
-To fine-tune on new data, place the datasets CSV file in `CRISPRon/tool data/datasets`. The CSV file should contain two columns: `30mer` and `mean_eff`, with `mean_eff` normalized between 0 and 1. For a specific dataset file `D.csv`, use the following command:
-
-`python tool.py --action new_data --new_data_path D`
-
-Note that this will create a model with the same name as the fine-tune CSV file.
+Make sure that `<dataset_name>` doesn't contain the `.csv` extension. This command will create a model with the same name as the fine-tune CSV file.
 
 
 
