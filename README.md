@@ -26,7 +26,7 @@ Our tool has been tested on the following configuration on a Linux machine:
 
 ## Running the Tool
 
-First, navigate to the CRISPRon folder using
+First, navigate to the CRISPRon folder:
 ```sh
 cd CRISPRon
 ```
