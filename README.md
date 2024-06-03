@@ -26,6 +26,11 @@ Our tool has been tested on the following configuration on a Linux machine:
 
 ## Running the Tool
 
+First, navigate to the CRISPRon folder using
+```sh
+cd CRISPRon
+```
+
 ### Checking Available Models
 To list available models, use the following command:
 ```sh
@@ -37,16 +42,31 @@ Note that the model `no_transfer_learning` is always available.
 The input file should be located at `CRISPRon/tool data/input` and should be a CSV file containing only one column `30mer`. An example file named `example.csv` is provided with the sequences of the dataset `doench2014-Hs`. To run the script, input the following command:
 
 ```sh
-python tool.py --action prediction --input_file <file_path> --model_to_use <model_name>
+python tool.py --action prediction --input_file <file_name> --model_to_use <model_name>
 ```
-Make sure that `<file_path>` doesn't contain the `.csv` extension. 
+
+An example run:
+```sh
+python tool.py --action prediction --input_file example --model_to_use leenay
+```
+
+
+Make sure that `<file_name>` doesn't contain the `.csv` extension. 
 
 The prediction results will appear in `CRISPRon/tool data/output`
 
 ### Fine-Tuning on New Data
 To fine-tune on new data, place the datasets CSV file in `CRISPRon/tool data/datasets`. The CSV file should contain two columns: `30mer` and `mean_eff`, with `mean_eff` normalized between 0 and 1. An example file named `example.csv` is provided with the sequences and labels for the dataset `doench2014-Hs`. To run the script, input the following command:
 
-`python tool.py --action new_data --new_data_path <dataset_name>`
+```sh
+python tool.py --action new_data --new_data_path <dataset_name>
+```
+
+An example run:
+```sh
+python tool.py --action new_data --new_data_path example
+```
+
 
 Make sure that `<dataset_name>` doesn't contain the `.csv` extension.
 
