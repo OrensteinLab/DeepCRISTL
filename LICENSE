@@ -27,7 +27,7 @@ The code contained in this repository is licensed under the MIT License as outli
 ### Datasets Used:
 - **Pretraining datasets** used in the CRISPRon study:
   - [CRISPRon dataset 1](https://www.nature.com/articles/s41467-021-23576-0)
-  - [CRISPRon dataset 2](https://www.nature.com/articles/s41587-020-0537-9)
+  - [CRISPRon dataset 2](https://www.science.org/doi/10.1126/sciadv.aax9249)
   
 - **Fine-tuning datasets** from various studies compiled in:
   - [Haeussler's paper](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-1012-2)
