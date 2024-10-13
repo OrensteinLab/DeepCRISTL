@@ -1,0 +1,36 @@
+MIT License
+
+Copyright (c) 2024 Orenstein Lab
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+## Additional Terms:
+
+The code contained in this repository is licensed under the MIT License as outlined above. However, the models provided in this repository were trained on external datasets and are **not** covered by the MIT License. Their use may be subject to the licensing terms of the original datasets.
+
+### Datasets Used:
+- **Pretraining datasets** used in the CRISPRon study:
+  - [CRISPRon dataset 1](https://www.nature.com/articles/s41467-021-23576-0)
+  - [CRISPRon dataset 2](https://www.nature.com/articles/s41587-020-0537-9)
+  
+- **Fine-tuning datasets** from various studies compiled in:
+  - [Haeussler's paper](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-1012-2)
+  - [Leenay study](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7388783/)
+
+Please review and comply with the licensing terms of these datasets when using the models.
