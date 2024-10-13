@@ -91,7 +91,7 @@ This command will create a model with the same name as the fine-tune CSV file.
   ### Pretraining Datasets:
   - **CRISPRon pretrain datasets**:
     - [Enhancing CRISPR-Cas9 gRNA efficiency prediction by data integration and deep learning](https://www.nature.com/articles/s41467-021-23576-0)
-    - [Prediction of the sequence-specific cleavage activity of Cas9 variants](https://www.nature.com/articles/s41587-020-0537-9)
+    - [SpCas9 activity prediction by DeepSpCas9, a deep learning–based model with high generalization performance](https://www.science.org/doi/10.1126/sciadv.aax9249)
 
   ### Fine-tuning Datasets:
   - **Compiled datasets from Haeussler's paper**:
