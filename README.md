@@ -83,6 +83,23 @@ This command will create a model with the same name as the fine-tune CSV file.
   - [Haussler](https://link.springer.com/article/10.1186/s13059-016-1012-2) for the target datasets.
 - [Leenay](https://www.nature.com/articles/s41587-019-0203-2) for the target dataset.
 
+## Licensing Information
+
+- The **code** in this repository is licensed under the [MIT License](./LICENSE).
+- The **models** in this repository were trained on external datasets. Their use may be subject to the licensing terms of the datasets from which they were derived. Please consult the following studies for information on the dataset licenses:
+
+  ### Pretraining Datasets:
+  - **CRISPRon pretrain datasets**:
+    - [Dataset 1](https://www.nature.com/articles/s41467-021-23576-0)
+    - [Dataset 2](https://www.nature.com/articles/s41587-020-0537-9)
+
+  ### Fine-tuning Datasets:
+  - **Compiled datasets from Haeussler's paper**:
+    - [Haeussler paper](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-1012-2)
+  - **Leenay study**:
+    - [Leenay paper](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7388783/)
+
+
 
 ## Contact
 In case of issues with the tool, you may contact us at yaron.orenstein@biu.ac.il.
