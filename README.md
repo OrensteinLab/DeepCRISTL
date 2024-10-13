@@ -90,14 +90,14 @@ This command will create a model with the same name as the fine-tune CSV file.
 
   ### Pretraining Datasets:
   - **CRISPRon pretrain datasets**:
-    - [Dataset 1](https://www.nature.com/articles/s41467-021-23576-0)
-    - [Dataset 2](https://www.nature.com/articles/s41587-020-0537-9)
+    - [Enhancing CRISPR-Cas9 gRNA efficiency prediction by data integration and deep learning](https://www.nature.com/articles/s41467-021-23576-0)
+    - [Prediction of the sequence-specific cleavage activity of Cas9 variants](https://www.nature.com/articles/s41587-020-0537-9)
 
   ### Fine-tuning Datasets:
   - **Compiled datasets from Haeussler's paper**:
-    - [Haeussler paper](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-1012-2)
+    - [Evaluation of off-target and on-target scoring algorithms and integration into the guide RNA selection tool CRISPOR](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-016-1012-2)
   - **Leenay study**:
-    - [Leenay paper](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7388783/)
+    - [Large dataset enables prediction of repair after CRISPR-Cas9 editing in primary T cells.](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7388783/)
 
 
 
