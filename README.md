@@ -79,7 +79,7 @@ This command will create a model with the same name as the fine-tune CSV file.
  - [CRISPRon](https://www.nature.com/articles/s41467-021-23576-0) for the architecture and pre-training data.
  - [Kim2019](https://www.science.org/doi/10.1126/sciadv.aax9249) for part of the pre-training data.
  - [DeepHF](https://www.nature.com/articles/s41467-019-12281-8) for models tested in the original paper.
- - [CRISPRoff](https://bulldogjob.com/news/449-how-to-write-a-good-readme-for-your-github-project) for the feature calculation used as part of the CRISPRon pipeline.
+ - [CRISPRoff](https://link.springer.com/article/10.1186/s13059-018-1534-x) for the feature calculation used as part of the CRISPRon pipeline.
   - [Haussler](https://link.springer.com/article/10.1186/s13059-016-1012-2) for the target datasets.
 - [Leenay](https://www.nature.com/articles/s41587-019-0203-2) for the target dataset.
 
