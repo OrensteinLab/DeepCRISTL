@@ -1,7 +1,7 @@
 
 # DeepCRISTL
 
-A tool to predict CRISPR/Cas9 gRNA on-target efficiency for specific cellular contexts utilizing transfer-learning. The repository for the paper [DeepCRISTL: deep transfer learning to predict CRISPR/Cas9 functional and endogenous on-target editing efficiency](https://academic.oup.com/bioinformatics/article/38/Supplement_1/i161/6617528)
+A tool to predict CRISPR/Cas9 gRNA on-target efficiency for specific cellular contexts utilizing transfer-learning. The repository for the paper [DeepCRISTL: deep transfer learning to predict CRISPR/Cas9 functional and endogenous on-target editing efficiency](https://academic.oup.com/bioinformatics/article/40/8/btae481/7723478)
 
 ## Requirements
 
